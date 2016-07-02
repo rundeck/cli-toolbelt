@@ -4,8 +4,8 @@ plugins {
 
 scmVersion {
     tag {
-//        prefix = 'v'
-//        versionSeparator = ''
+        prefix = ''
+        versionSeparator = ''
     }
 }
 
