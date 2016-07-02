@@ -1,0 +1,13 @@
+
+apply plugin: 'groovy'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile 'org.codehaus.groovy:groovy-all:2.3.4'
+    compile project(":toolbelt")
+}
