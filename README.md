@@ -33,13 +33,13 @@ class Main{
 Commandline:  
 
 
-   $ java ... Main greet hi --name bob
+    $ java ... Main greet hi --name bob
 
-   Hello, bob.
+    Hello, bob.
 
-   $ java ... Main greet remark --age 33
+    $ java ... Main greet remark --age 33
 
-   I see you are 33 years old.
+    I see you are 33 years old.
 
 
 
@@ -55,7 +55,9 @@ method parameter with arg name "somearg".
 
 You can define multiple commands (with their subcommands) in one step: 
 
-           ToolBelt.with(new Command1(), new Command2(),...).runMain(args);
+~~~{.java}
+ToolBelt.with(new Command1(), new Command2(),...).runMain(args);
+~~~
 
 For more advanced usage, see below:
 
@@ -112,7 +114,7 @@ container objects.
 
    }
 
-   List&lt;Object&gt; getCommands(){
+   List<Object> getCommands(){
 
        return Arrays.asList(new Second());
 
@@ -131,18 +133,18 @@ container objects.
 This will define an interface like:
 
 
-   $ java ... First
+    $ java ... First
 
-   Available commands: [something, second]
+    Available commands: [something, second]
 
-   $ java ... First something
+    $ java ... First something
 
-   This method prints something
+    This method prints something
 
-   $ java ... First second
+    $ java ... First second
 
-   Availabe commands: [third]
+    Availabe commands: [third]
 
-   $ java ... First second third
+    $ java ... First second third
 
-   Third level nested command
+    Third level nested command
