@@ -39,9 +39,8 @@ public class ToolBelt {
      */
     public static Tool with(String name, CommandInput input, Object... commands) {
         return belt(name).defaultHelpCommands()
-                         .ansiColorOutput(System.getenv("TERM") != null && System.getenv("TERM").contains("color"))
+                         .ansiColorOutput(isAnsiColorEnvEnabled())
                          .commandInput(input)
-                         .systemOutput()
                          .add(commands)
                          .buckle();
     }
@@ -56,10 +55,17 @@ public class ToolBelt {
      */
     public static Tool with(String name, CommandOutput output, Object... commands) {
         return belt(name).defaultHelpCommands()
-                         .commandInput(new SimpleCommandInput())
                          .commandOutput(output)
+                         .commandInput(new SimpleCommandInput())
                          .add(commands)
                          .buckle();
+    }
+
+    /**
+     * @return true if the TERM env var contains 'color'
+     */
+    public static boolean isAnsiColorEnvEnabled() {
+        return System.getenv("TERM") != null && System.getenv("TERM").contains("color");
     }
 
     /**
