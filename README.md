@@ -53,6 +53,20 @@ Builtin features:
 
 [JewelCLI]: https://github.com/lexicalscope/jewelcli/
 
+# Using
+
+Find the latest version from the [Releases][] section, import via [jitpack.io](https://jitpack.io/#simplifyops/cli-toolbelt):
+
+[![](https://jitpack.io/v/simplifyops/cli-toolbelt.svg)](https://jitpack.io/#simplifyops/cli-toolbelt)
+
+Gradle build:
+
+~~~ {.groovy}
+compile 'com.github.simplifyops.cli-toolbelt:toolbelt:VERSION'
+~~~
+
+[Releases]: https://github.com/simplifyops/cli-toolbelt/releases
+
 # In Progress
 
 * Groovy builder support, see the toolbelt-groovy submodule
