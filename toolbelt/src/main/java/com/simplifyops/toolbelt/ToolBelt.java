@@ -39,6 +39,7 @@ public class ToolBelt {
      */
     public static Tool with(String name, CommandInput input, Object... commands) {
         return belt(name).defaultHelpCommands()
+                         .ansiColorOutput(System.getenv("TERM") != null && System.getenv("TERM").contains("color"))
                          .commandInput(input)
                          .systemOutput()
                          .add(commands)
