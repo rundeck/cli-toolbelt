@@ -12,6 +12,11 @@ scmVersion {
 allprojects {
     project.version = scmVersion.version
     apply plugin: 'maven'
+
+}
+subprojects{
+    apply plugin: 'java'
+    apply from: "${rootDir}/gradle/java.gradle"
 }
 
 apply plugin: 'idea'
