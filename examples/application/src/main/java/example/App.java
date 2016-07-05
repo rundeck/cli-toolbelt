@@ -11,15 +11,11 @@ import java.io.IOException;
 public class App {
 
     public static void main(String[] args) throws IOException, CommandRunFailure {
-        ToolBelt.belt("example")
-                .ansiColorOutput(System.getenv("NOCOLOR") == null)
-                .defaultHelpCommands()
-                .add(
-                        new App(),
-                        new Sub()
-                )
-                .commandInput(new SimpleCommandInput())
-                .buckle().runMain(args, true);
+        ToolBelt.with(
+                "example",
+                new App(),
+                new Sub()
+        ).runMain(args, true);
     }
 
     @Command(description = "Start here, run: example begin")
@@ -40,7 +36,7 @@ public class App {
                 " if you want to."
         ));
         output.output("");
-        output.output("Try setting NOCOLOR=1 in your environment, and run: `example colorize` again");
+        output.output("Try setting TERM=blah in your environment, and run: `example colorize` again");
         output.output("");
         output.output(ANSIColorOutput.colorize(
                 "next try: ",
