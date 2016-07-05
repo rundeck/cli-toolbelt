@@ -62,7 +62,12 @@ Find the latest version from the [Releases][] section, import via [jitpack.io](h
 Gradle build:
 
 ~~~ {.groovy}
-compile 'com.github.simplifyops.cli-toolbelt:toolbelt:VERSION'
+repositories {
+    maven { url "https://jitpack.io" }
+}
+dependencies{
+    compile 'com.github.simplifyops.cli-toolbelt:toolbelt:VERSION'
+}
 ~~~
 
 [Releases]: https://github.com/simplifyops/cli-toolbelt/releases
