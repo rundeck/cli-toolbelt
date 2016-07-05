@@ -1,12 +1,78 @@
-Defines a set of commands with subcommands, using annotations to indicate methods to expose as subcommands. 
+# CLI Toolbelt
 
-"Commands" represent an invocable named action, with optional arguments.  A "Command" may also be a container
-for other "Commands" (i.e. "Subcommands"). In that case, the parent "command" is called a "command container". 
+Use simple annotations to define an easy commandline interface for your Java code.
+
+# Example
+
+Get this:
+
+![console output](https://github.com/simplifyops/cli-toolbelt/raw/master/examples/demo/img/screenshot-console1.png)
+
+From this:
+
+~~~ {.java}
+package example;
+
+import com.simplifyops.toolbelt.*;
+
+import java.io.IOException;
+
+@SubCommand
+public class App {
+
+    public static void main(String[] args) throws IOException, CommandRunFailure {
+        ToolBelt.with("example", new App()).runMain(args, true);
+    }
+
+    @Command(description = "Simple example")
+    public void simple() {
+        System.out.println("Easily create commandlines with simple annotation");
+    }
+
+    @Command(description = "Fancy example")
+    public boolean fancy(@Arg("string") String val) {
+        System.out.println("Basic commandline parsing " + val);
+        return true;
+    }
+}
+~~~
+
+# Purpose
+
+Simply use annotations on instance method to indicate commands to expose via the CLI.
+ 
+You can group related sets of commands into different classes, and tie them together
+with a top-level "Toolbelt" class.
+
+Builtin features:
+ 
+* ANSI colorized output
+* Simple argument parsing 
+* Or plugin in a more advanced parser like [JewelCLI][]
+* Support for printing basic Java container objects in a nice way
+
+[JewelCLI]: https://github.com/lexicalscope/jewelcli/
+
+# In Progress
+
+* Groovy builder support, see the toolbelt-groovy submodule
+
+# Design
+
+* "Command" : an invocable named action, with optional arguments.
+* "Command container": A "Command" may also be a container for other "Commands" (i.e. "Subcommands"). 
+    In that case, the parent "command" is called a "command container". 
 
 The simplest structure is a Class with Methods, where the Class is the command container, and the methods are the
-sub commands. 
+sub commands.
 
-For further nesting, the class can implement {@link com.simplifyops.toolbelt.HasSubCommands} and return
+# Examples
+
+See the [examples](https://github.com/simplifyops/cli-toolbelt/tree/master/examples) directory.
+
+# More Info
+
+For further nesting, the class can implement `HasSubCommands` and return
 other command container objects. 
 
 Simplest usage: 
