@@ -1,8 +1,6 @@
 package com.simplifyops.toolbelt;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by greg on 6/13/16.
@@ -189,5 +187,28 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
             }
         });
         return new Colorized(colors, prefix + wrapped + suffix);
+    }
+
+    /**
+     * Return a map with key/values replaced with colorized versions, if specified
+     *
+     * @param data  data
+     * @param key   key color, or null
+     * @param value value color, or null
+     *
+     * @return colorized keys/values
+     */
+    public static Map<?, ?> colorizeMap(
+            Map<?, ?> data,
+            ANSIColorOutput.Color key,
+            ANSIColorOutput.Color value
+    )
+    {
+        LinkedHashMap<Object, Object> result = new LinkedHashMap<>();
+        data.keySet().forEach(k -> result.put(
+                key != null ? ANSIColorOutput.colorize(key, k.toString()) : k,
+                value != null ? ANSIColorOutput.colorize(value, data.get(k).toString()) : data.get(k)
+        ));
+        return result;
     }
 }
