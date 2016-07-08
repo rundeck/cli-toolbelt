@@ -29,7 +29,10 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
         sink.output(toColors(object));
     }
 
-    private String toColors(final Object object) {
+    public static String toColors(final Object object) {
+        if (null == object) {
+            return null;
+        }
         if (ColorString.class.isAssignableFrom(object.getClass())) {
             ColorString object1 = (ColorString) object;
             Set<ColorArea> colors = object1.getColors();
@@ -51,7 +54,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
                     sb.append(string.substring(cur, cur + area.getLength()));
                     cur += area.getLength();
                     sb.append(RESET);
-                }else {
+                } else {
 
                     count++;
                 }
