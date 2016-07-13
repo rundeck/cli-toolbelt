@@ -1,7 +1,8 @@
 /**
  * Example using groovy DSL for subcommand definition
  */
-@Grab(group = 'com.simplifyops.toolbelt', module = 'toolbelt-groovy', version = '0.1.1-SNAPSHOT')
+@GrabResolver(name='jitpack', root='https://jitpack.io')
+@Grab('com.github.simplifyops.cli-toolbelt:toolbelt-groovy:-SNAPSHOT')
 import static com.simplifyops.toolbelt.groovy.Toolbelt.toolbelt
 
 
