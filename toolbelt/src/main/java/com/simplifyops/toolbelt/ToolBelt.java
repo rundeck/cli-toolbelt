@@ -659,6 +659,9 @@ public class ToolBelt {
                 return false;
             } catch (InvocationTargetException e) {
                 if (e.getCause() != null) {
+                    if (e.getCause() instanceof InputError) {
+                        throw (InputError) e.getCause();
+                    }
                     e.getCause().printStackTrace();
                 } else {
                     e.printStackTrace();
