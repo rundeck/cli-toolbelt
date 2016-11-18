@@ -17,6 +17,11 @@ public class FormattedOutput implements CommandOutput {
     }
 
     @Override
+    public void info(final Object output) {
+        delegate.info(formatter.format(output));
+    }
+
+    @Override
     public void output(final Object output)  {
         delegate.output(formatter.format(output));
 

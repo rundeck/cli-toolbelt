@@ -5,6 +5,11 @@ package com.simplifyops.toolbelt;
  */
 public class SystemOutput implements CommandOutput {
     @Override
+    public void info(final Object output) {
+        System.out.println(output);
+    }
+
+    @Override
     public void output(final Object output) {
         System.out.println(output);
     }

@@ -34,6 +34,11 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
     }
 
     @Override
+    public void info(final Object output) {
+        sink.info(toColors(output));
+    }
+
+    @Override
     public void output(final Object object) {
         sink.output(toColors(object));
     }

@@ -42,6 +42,12 @@ class ToolBeltSpec extends Specification {
         List<Object> output = []
         List<Object> error = []
         List<Object> warning = []
+        List<Object> info = []
+
+        @Override
+        void info(final Object output) {
+            this.info << output
+        }
 
         @Override
         void output(final Object output) {
