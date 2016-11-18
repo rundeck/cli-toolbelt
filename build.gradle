@@ -7,6 +7,7 @@ scmVersion {
         prefix = ''
         versionSeparator = ''
     }
+    ignoreUncommittedChanges = false
 }
 
 allprojects {
