@@ -15,6 +15,7 @@ public class ToolBelt {
     private CommandInput inputParser;
     private Set<String> helpCommands;
     private CommandOutput commandOutput;
+    private ChannelOutput.Builder channels;
     private OutputFormatter baseFormatter;
     private OutputFormatter formatter;
     private boolean ansiColor;
@@ -96,6 +97,7 @@ public class ToolBelt {
     protected ToolBelt(String name) {
         commands = new CommandSet(name);
         helpCommands = new HashSet<>();
+        channels = ChannelOutput.builder();
     }
 
     /**
@@ -169,6 +171,15 @@ public class ToolBelt {
     public ToolBelt commandOutput(CommandOutput output) {
         commandOutput = output;
         return this;
+    }
+
+    /**
+     * Configure channels
+     *
+     * @return
+     */
+    public ChannelOutput.Builder channels() {
+        return channels;
     }
 
     /**
@@ -597,16 +608,26 @@ public class ToolBelt {
     }
     public CommandOutput finalOutput() {
         if (null == commandOutput) {
-            commandOutput(ansiColor ? new ANSIColorOutput(new SystemOutput()) : new SystemOutput());
+            commandOutput(defaultOutput());
         }
-        baseFormatter = new NiceFormatter(ansiColor ? new ANSIColorOutput(null) : new ToStringFormatter());
+        baseFormatter = defaultBaseFormatter();
+        channels.fallback(commandOutput);
+        ChannelOutput channel = channels.build();
         if (null == builtOutput) {
             builtOutput = new FormattedOutput(
-                    commandOutput,
+                    channel,
                     null != formatter ? formatter.withBase(baseFormatter) : baseFormatter
             );
         }
         return builtOutput;
+    }
+
+    public OutputFormatter defaultBaseFormatter() {
+        return new NiceFormatter(ansiColor ? new ANSIColorOutput(null) : new ToStringFormatter());
+    }
+
+    public CommandOutput defaultOutput() {
+        return ansiColor ? new ANSIColorOutput(new SystemOutput()) : new SystemOutput();
     }
 
     public static interface CommandInvoker {
