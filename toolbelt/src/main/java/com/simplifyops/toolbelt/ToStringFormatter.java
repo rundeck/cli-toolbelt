@@ -8,4 +8,9 @@ public class ToStringFormatter implements OutputFormatter {
     public String format(final Object o) {
         return o != null ? o.toString() : null;
     }
+
+    @Override
+    public OutputFormatter withBase(final OutputFormatter base) {
+        return base;
+    }
 }

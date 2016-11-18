@@ -57,6 +57,10 @@ public class YamlFormatter implements OutputFormatter {
         this.base = base;
     }
 
+    @Override
+    public OutputFormatter withBase(final OutputFormatter base) {
+        return new YamlFormatter(this.yaml, base);
+    }
 
     /**
      * @param base    base formatter

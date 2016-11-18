@@ -15,7 +15,9 @@ public class ToolBelt {
     private CommandInput inputParser;
     private Set<String> helpCommands;
     private CommandOutput commandOutput;
+    private OutputFormatter baseFormatter;
     private OutputFormatter formatter;
+    private boolean ansiColor;
 
     /**
      * Create a simple CLI tool for the object, using {@link SimpleCommandInput} to parse
@@ -94,7 +96,6 @@ public class ToolBelt {
     protected ToolBelt(String name) {
         commands = new CommandSet(name);
         helpCommands = new HashSet<>();
-        formatter = new NiceFormatter(new ToStringFormatter());
     }
 
     /**
@@ -147,8 +148,7 @@ public class ToolBelt {
      * @return this builder
      */
     public ToolBelt ansiColorOutput(boolean enabled) {
-        commandOutput(enabled ? new ANSIColorOutput(new SystemOutput()) : new SystemOutput());
-        formatter = new NiceFormatter(enabled ? new ANSIColorOutput(null) : new ToStringFormatter());
+        ansiColor = true;
         return this;
     }
 
@@ -168,6 +168,16 @@ public class ToolBelt {
      */
     public ToolBelt commandOutput(CommandOutput output) {
         commandOutput = output;
+        return this;
+    }
+
+    /**
+     * Format output data with this formatter
+     *
+     * @return this
+     */
+    public ToolBelt formatter(OutputFormatter formatter) {
+        this.formatter = formatter;
         return this;
     }
 
@@ -586,8 +596,15 @@ public class ToolBelt {
         return this;
     }
     public CommandOutput finalOutput() {
+        if (null == commandOutput) {
+            commandOutput(ansiColor ? new ANSIColorOutput(new SystemOutput()) : new SystemOutput());
+        }
+        baseFormatter = new NiceFormatter(ansiColor ? new ANSIColorOutput(null) : new ToStringFormatter());
         if (null == builtOutput) {
-            builtOutput = new FormattedOutput(commandOutput, formatter);
+            builtOutput = new FormattedOutput(
+                    commandOutput,
+                    null != formatter ? formatter.withBase(baseFormatter) : baseFormatter
+            );
         }
         return builtOutput;
     }

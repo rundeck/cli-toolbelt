@@ -19,6 +19,12 @@ public class NiceFormatter implements OutputFormatter {
     }
 
     @Override
+    public OutputFormatter withBase(final OutputFormatter base) {
+        this.base = base;
+        return this;
+    }
+
+    @Override
     public String format(final Object o) {
         if (o instanceof Map) {
             return formatMap((Map) o, 0);

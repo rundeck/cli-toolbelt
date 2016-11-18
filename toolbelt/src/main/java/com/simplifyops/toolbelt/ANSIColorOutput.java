@@ -11,10 +11,21 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
     private static final Object RED = ESC + "[31m";
     private static final Object YELLOW = ESC + "[33m";
 
+    private OutputFormatter base;
     SystemOutput sink;
 
     public ANSIColorOutput(final SystemOutput sink) {
         this.sink = sink;
+    }
+
+    public ANSIColorOutput(final SystemOutput sink, OutputFormatter base) {
+        this.sink = sink;
+        this.base = base;
+    }
+
+    @Override
+    public OutputFormatter withBase(final OutputFormatter base) {
+        return new ANSIColorOutput(sink, base);
     }
 
     @Override
@@ -28,13 +39,17 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
     }
 
     public static String toColors(final Object object) {
+        return toColors(object, null);
+    }
+
+    public static String toColors(final Object object, OutputFormatter base) {
         if (null == object) {
             return null;
         }
         if (ColorString.class.isAssignableFrom(object.getClass())) {
             ColorString object1 = (ColorString) object;
             Set<ColorArea> colors = object1.getColors();
-            String string = object1.toString();
+            String string = null != base ? base.format(object1) : object1.toString();
             int cur = 0;
             int count = 0;
             StringBuilder sb = new StringBuilder();
@@ -66,7 +81,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
             }
             return sb.toString();
         } else {
-            return object.toString();
+            return null != base ? base.format(object) : object.toString();
         }
     }
 

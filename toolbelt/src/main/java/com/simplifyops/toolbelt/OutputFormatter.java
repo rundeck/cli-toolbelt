@@ -5,4 +5,6 @@ package com.simplifyops.toolbelt;
  */
 public interface OutputFormatter {
     String format(Object o);
+
+    OutputFormatter withBase(OutputFormatter base);
 }
