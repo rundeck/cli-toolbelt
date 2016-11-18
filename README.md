@@ -50,6 +50,7 @@ Builtin features:
 * Simple argument parsing 
 * Or plugin in a more advanced parser like [JewelCLI][]
 * Support for printing basic Java container objects in a nice way
+* Support for YAML and JSON formatted output for scripting
 
 [JewelCLI]: https://github.com/lexicalscope/jewelcli/
 
@@ -87,12 +88,10 @@ sub commands.
 
 # Examples
 
-See the [examples](https://github.com/simplifyops/cli-toolbelt/tree/master/examples) directory.
+* Full featured example: [rundeck-cli commandline tool](https://github.com/rundeck/rundeck-cli)
+* See the [examples](https://github.com/simplifyops/cli-toolbelt/tree/master/examples) directory.
 
 # More Info
-
-For further nesting, the class can implement `HasSubCommands` and return
-other command container objects. 
 
 Simplest usage: 
 
@@ -184,8 +183,10 @@ command/subcommand.  The method parameters will be parsed using the input parser
 
 ## Using HasSubCommand interface:
 
+For further nesting, the class can implement `HasSubCommands` and return
+other command container objects. 
 
-If a @Command annotated class wants to define a subcommand which is also a container (has subcommands of
+If a `@Command` annotated class wants to define a subcommand which is also a container (has subcommands of
 its own), It should implement {@link com.simplifyops.toolbelt.HasSubCommands}, and return a list of command
 container objects.
 
