@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
  */
 public class NiceFormatter implements OutputFormatter {
     OutputFormatter base;
-    String collectionIndicator = "* ";
-    String keyValueSeparator = ": ";
-    String indentation = "  ";
+    private String collectionIndicator = "* ";
+    private String keyValueSeparator = ": ";
+    private String indentation = "  ";
     static final String NL = System.getProperty("line.separator");
 
     public NiceFormatter(final OutputFormatter base) {
@@ -97,4 +97,29 @@ public class NiceFormatter implements OutputFormatter {
         }
         return sb.toString();
     }
+
+    public String getCollectionIndicator() {
+        return collectionIndicator;
+    }
+
+    public void setCollectionIndicator(String collectionIndicator) {
+        this.collectionIndicator = collectionIndicator;
+    }
+
+    public String getKeyValueSeparator() {
+        return keyValueSeparator;
+    }
+
+    public void setKeyValueSeparator(String keyValueSeparator) {
+        this.keyValueSeparator = keyValueSeparator;
+    }
+
+    public String getIndentation() {
+        return indentation;
+    }
+
+    public void setIndentation(String indentation) {
+        this.indentation = indentation;
+    }
+
 }
