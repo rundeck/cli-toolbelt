@@ -1,9 +1,11 @@
-package com.simplifyops.toolbelt.output.yaml.snakeyaml;
+package com.simplifyops.toolbelt.format.yaml.snakeyaml;
 
 import com.simplifyops.toolbelt.Formatable;
 import com.simplifyops.toolbelt.OutputFormatter;
+import com.simplifyops.toolbelt.ToStringFormatter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,12 +21,42 @@ public class YamlFormatter implements OutputFormatter {
     private OutputFormatter base;
 
     /**
+     */
+    public YamlFormatter() {
+        this.yaml = new Yaml();
+        this.base = new ToStringFormatter();
+    }
+
+    /**
+     */
+    public YamlFormatter(Representer representer, DumperOptions options) {
+        this.yaml = new Yaml(representer, options);
+        this.base = new ToStringFormatter();
+    }
+
+    /**
+     */
+    public YamlFormatter(DumperOptions options) {
+        this.yaml = new Yaml(options);
+        this.base = new ToStringFormatter();
+    }
+
+    /**
      * @param base base formatter
      */
     public YamlFormatter(final OutputFormatter base) {
+        this();
         this.base = base;
-        this.yaml = new Yaml();
     }
+
+    /**
+     * @param base base formatter
+     */
+    private YamlFormatter(Yaml yaml, final OutputFormatter base) {
+        this.yaml = yaml;
+        this.base = base;
+    }
+
 
     /**
      * @param base    base formatter
