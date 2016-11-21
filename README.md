@@ -1,6 +1,8 @@
 # CLI Toolbelt
 
-Use simple annotations to define an easy commandline interface for your Java code.
+Java Commandline Interface in three lines of code... **or your money back**.
+
+(Free)
 
 # Example
 
@@ -48,7 +50,7 @@ Builtin features:
  
 * ANSI colorized output
 * Simple argument parsing 
-* Or plugin in a more advanced parser like [JewelCLI][]
+* Or plugin in a more advanced parser like [JewelCLI][] (see [below](#using-jewelcli))
 * Support for printing basic Java container objects in a nice way
 * Support for YAML and JSON formatted output for scripting
 
@@ -57,6 +59,8 @@ Builtin features:
 # Using
 
 Find the latest version from the [Releases][] section, import via [jitpack.io](https://jitpack.io/#simplifyops/cli-toolbelt):
+
+[Releases]: https://github.com/simplifyops/cli-toolbelt/releases
 
 [![](https://jitpack.io/v/simplifyops/cli-toolbelt.svg)](https://jitpack.io/#simplifyops/cli-toolbelt)
 
@@ -71,7 +75,9 @@ dependencies{
 }
 ~~~
 
-[Releases]: https://github.com/simplifyops/cli-toolbelt/releases
+# Javadoc
+
+[via jitpack.io](https://jitpack.io/com/github/simplifyops/cli-toolbelt/toolbelt/master-SNAPSHOT/javadoc/)
 
 # In Progress
 
@@ -234,3 +240,54 @@ This will define an interface like:
     $ java ... First second third
 
     Third level nested command
+
+# Using JewelCLI
+
+[JewelCLI][] is a useful interface-based commandline argument parser.  You
+can use it with cli-toolbelt:
+
+
+Add `toolbelt-jewelcli` dependency to your Gradle build:
+
+~~~ {.groovy}
+repositories {
+    maven { url "https://jitpack.io" }
+}
+dependencies{
+    compile 'com.github.simplifyops.cli-toolbelt:toolbelt:VERSION'
+    compile 'com.github.simplifyops.cli-toolbelt:toolbelt-jewelcli:VERSION'
+}
+~~~
+
+Add `JewelInput` as a InputParser to your ToolBelt:
+
+~~~{.java}
+import com.simplifyops.toolbelt.input.jewelcli.JewelInput;
+...
+Tool cli = ToolBelt.belt(name)
+    .add(new MyCommand())
+    .commandInput(new JewelInput())
+    .build();
+~~~
+
+In the `@Command` methods of `MyCommand`, use a parameter annotated with the
+JewelCLI commandline argument annotations:
+ 
+ ~~~{.java}  
+import com.lexicalscope.jewel.cli.Option;
+
+     interface Widget{
+        @Option(shortName="n",description="Widget name")
+        String getName();
+     }
+     @Command(description = "Requeques widgets")
+     public boolean requeue(Widget options, CommandOutput out) {
+        out.output("Requeueing widget "+options.getName()+"...");
+        //...
+     }
+ ~~~
+ 
+See the other annotations available from [JewelCLI][]
+
+
+[JewelCLI]: http://jewelcli.lexicalscope.com/
