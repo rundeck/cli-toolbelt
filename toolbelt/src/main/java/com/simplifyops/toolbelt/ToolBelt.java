@@ -19,6 +19,7 @@ public class ToolBelt {
     private OutputFormatter baseFormatter;
     private OutputFormatter formatter;
     private boolean ansiColor;
+    private ANSIColorOutput.Builder ansiBuilder = ANSIColorOutput.builder().sink(new SystemOutput());
 
     /**
      * Create a simple CLI tool for the object, using {@link SimpleCommandInput} to parse
@@ -152,6 +153,10 @@ public class ToolBelt {
     public ToolBelt ansiColorOutput(boolean enabled) {
         ansiColor = enabled;
         return this;
+    }
+
+    public ANSIColorOutput.Builder ansiColor() {
+        return ansiBuilder;
     }
 
     /**
@@ -623,11 +628,11 @@ public class ToolBelt {
     }
 
     public OutputFormatter defaultBaseFormatter() {
-        return new NiceFormatter(ansiColor ? new ANSIColorOutput(null) : new ToStringFormatter());
+        return new NiceFormatter(ansiColor ? ansiBuilder.build() : new ToStringFormatter());
     }
 
     public CommandOutput defaultOutput() {
-        return ansiColor ? new ANSIColorOutput(new SystemOutput()) : new SystemOutput();
+        return ansiColor ? ansiBuilder.build() : new SystemOutput();
     }
 
     public static interface CommandInvoker {
