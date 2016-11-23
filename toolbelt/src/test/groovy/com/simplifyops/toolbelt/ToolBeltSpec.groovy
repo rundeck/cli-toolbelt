@@ -128,4 +128,29 @@ class ToolBeltSpec extends Specification {
         test.leaving == true
         result == false
     }
+
+    class ColorTool {
+
+        @Command(isSolo = true)
+        public void greet(CommandOutput out) {
+            out.output(ANSIColorOutput.colorize(ANSIColorOutput.Color.BLUE, "test"))
+        }
+    }
+
+    def "ansi color enabled"() {
+        given:
+        def test = new ColorTool()
+        def output = new TestOutput()
+        def tool = ToolBelt.belt('test').add(test).ansiColorOutput(isenabled).commandOutput(output).buckle()
+
+        when:
+        def result = tool.runMain(['colortool'] as String[], false)
+        then:
+        output.output == [expect]
+
+        where:
+        isenabled | expect
+        true      | '\u001B[34mtest\u001B[0m'
+        false     | "test"
+    }
 }

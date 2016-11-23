@@ -150,7 +150,7 @@ public class ToolBelt {
      * @return this builder
      */
     public ToolBelt ansiColorOutput(boolean enabled) {
-        ansiColor = true;
+        ansiColor = enabled;
         return this;
     }
 
