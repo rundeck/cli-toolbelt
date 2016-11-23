@@ -24,6 +24,9 @@ public class SystemOutput implements CommandOutput {
         System.err.println(error);
     }
 
+    public void outPrint(final Object out) {
+        System.out.print(out);
+    }
     public void errorPrint(final Object error) {
         System.err.print(error);
     }

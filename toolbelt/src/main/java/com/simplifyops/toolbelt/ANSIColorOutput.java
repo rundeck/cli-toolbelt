@@ -2,17 +2,150 @@ package com.simplifyops.toolbelt;
 
 import java.util.*;
 
+
 /**
  * Created by greg on 6/13/16.
  */
 public class ANSIColorOutput implements CommandOutput, OutputFormatter {
     private static final Object ESC = "\u001B";
-    private static final Object RESET = ESC + "[0m";
-    private static final Object RED = ESC + "[31m";
-    private static final Object YELLOW = ESC + "[33m";
+
+    /**
+     * Default color config
+     */
+    static final Config DEFAULT = new Config(Color.GREEN, null, Color.YELLOW, Color.RED);
 
     private OutputFormatter base;
     SystemOutput sink;
+    private Config config = new Config(DEFAULT);
+
+    public ANSIColorOutput(
+            final SystemOutput sink,
+            final OutputFormatter formatter,
+            final Config config
+    )
+    {
+        this(sink, formatter);
+        this.config = config;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
+    }
+
+    /**
+     * Configuration
+     */
+    public static class Config {
+        /**
+         * @return info color or null for none
+         */
+        Color info;
+
+        /**
+         * @return output color or null for none
+         */
+        Color output;
+
+        /**
+         * @return warning color or null for none
+         */
+        Color warning;
+
+        /**
+         * @return error color or null for none
+         */
+        Color error;
+
+        public Config(final Color info, final Color output, final Color warning, final Color error) {
+            this.info = info;
+            this.output = output;
+            this.warning = warning;
+            this.error = error;
+        }
+
+        public Config(Config config) {
+            this.info = config.info;
+            this.output = config.output;
+            this.warning = config.warning;
+            this.error = config.error;
+        }
+    }
+
+    public static class Builder {
+        private ANSIColorOutput.Config config = new Config(DEFAULT);
+        SystemOutput sink;
+        OutputFormatter formatter;
+
+
+        /**
+         * @param color name of a Color
+         *
+         * @return
+         */
+        public Builder info(final String color) {
+            return info(null != color ? ANSIColorOutput.Color.valueOf(color.toUpperCase()) : null);
+        }
+
+        public Builder info(final ANSIColorOutput.Color info) {
+            config.info = info;
+            return this;
+        }
+
+        public Builder output(final String color) {
+            return output(null != color ? ANSIColorOutput.Color.valueOf(color.toUpperCase()) : null);
+        }
+
+        public Builder output(final ANSIColorOutput.Color output) {
+            config.output = output;
+            return this;
+        }
+
+        public Builder warning(final String color) {
+            return warning(null != color ? ANSIColorOutput.Color.valueOf(color.toUpperCase()) : null);
+        }
+
+        public Builder warning(final ANSIColorOutput.Color warning) {
+            config.warning = warning;
+            return this;
+        }
+
+        public Builder error(final String color) {
+            return warning(null != color ? ANSIColorOutput.Color.valueOf(color.toUpperCase()) : null);
+        }
+
+        public Builder error(final ANSIColorOutput.Color error) {
+            config.error = error;
+            return this;
+        }
+
+        public Builder config(final ANSIColorOutput.Config config) {
+            this.config = config;
+            return this;
+        }
+
+        public Builder sink(final SystemOutput sink) {
+            this.sink = sink;
+            return this;
+        }
+
+        public Builder formatter(final OutputFormatter formatter) {
+            this.formatter = formatter;
+            return this;
+        }
+
+        public ANSIColorOutput build() {
+            return new ANSIColorOutput(sink, formatter, new Config(config));
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
 
     public ANSIColorOutput(final SystemOutput sink) {
         this.sink = sink;
@@ -35,12 +168,26 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
 
     @Override
     public void info(final Object output) {
-        sink.info(toColors(output));
+        if (output instanceof String && null != config.info) {
+            sink.outPrint(config.info);
+            sink.info(output);
+            sink.outPrint(Color.RESET);
+        } else {
+            sink.info(toColors(output));
+        }
+
     }
 
     @Override
     public void output(final Object object) {
-        sink.output(toColors(object));
+
+        if (object instanceof String && null != config.output) {
+            sink.outPrint(config.output);
+            sink.info(object);
+            sink.outPrint(Color.RESET);
+        } else {
+            sink.output(toColors(object));
+        }
     }
 
     public static String toColors(final Object object) {
@@ -60,7 +207,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
             StringBuilder sb = new StringBuilder();
             for (ColorArea area : colors) {
                 if (count > 0) {
-                    sb.append(RESET);
+                    sb.append(Color.RESET.toString());
                     count--;
                 }
                 if (area.getStart() > cur) {
@@ -71,7 +218,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
                 if (area.getLength() > 0) {
                     sb.append(string.substring(cur, cur + area.getLength()));
                     cur += area.getLength();
-                    sb.append(RESET);
+                    sb.append(Color.RESET.toString());
                 } else {
 
                     count++;
@@ -82,7 +229,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
             }
 
             if (count > 0) {
-                sb.append(RESET);
+                sb.append(Color.RESET.toString());
             }
             return sb.toString();
         } else {
@@ -92,17 +239,25 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
 
     @Override
     public void error(final Object error) {
-        sink.errorPrint(RED);
+        if (null != config.error) {
+            sink.errorPrint(config.error);
+        }
         sink.error(error);
-        sink.errorPrint(RESET);
+        if (null != config.error) {
+            sink.errorPrint(Color.RESET);
+        }
     }
 
 
     @Override
     public void warning(final Object error) {
-        sink.errorPrint(YELLOW);
+        if (null != config.warning) {
+            sink.errorPrint(config.warning);
+        }
         sink.warning(error);
-        sink.errorPrint(RESET);
+        if (null != config.warning) {
+            sink.errorPrint(Color.RESET);
+        }
     }
 
     public static enum Color {
