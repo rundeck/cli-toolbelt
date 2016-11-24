@@ -1,6 +1,8 @@
 package com.simplifyops.toolbelt;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -271,7 +273,29 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
         INDIGO("38;5;90"),
         VIOLET("38;5;165"),
         MAGENTA("35"),
-        WHITE("37");
+        CYAN("36"),
+        BLACK("30"),
+        WHITE("37"),
+
+        LIGHTBLACK("90"),
+        LIGHTRED("91"),
+        LIGHTGREEN("92"),
+        LIGHTYELLOW("93"),
+        LIGHTBLUE("94"),
+        LIGHTMAGENTA("95"),
+        LIGHTCYAN("96"),
+        LIGHTWHITE("97"),
+
+        BGBLACK("40"),
+        BGRED("41"),
+        BGGREEN("42"),
+        BGYELLOW("43"),
+        BGBLUE("44"),
+        BGMAGENTA("45"),
+        BGCYAN("46"),
+        BGWHITE("47"),
+        BGDEFAULT("49");
+
         String code;
 
         Color(String code) {
