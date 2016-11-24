@@ -28,6 +28,11 @@ public @interface Command {
     boolean isSolo() default false;
 
     /**
+     * @return true if this method should not be printed in listings
+     */
+    boolean isHidden() default false;
+
+    /**
      * @return help text description
      */
     String description() default "";

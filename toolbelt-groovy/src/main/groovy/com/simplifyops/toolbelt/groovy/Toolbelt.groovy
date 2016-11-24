@@ -108,6 +108,11 @@ class Toolbelt {
         CommandContext commandContext
 
         @Override
+        boolean isHidden() {
+            return false
+        }
+
+        @Override
         boolean isDefault() {
             return false
         }

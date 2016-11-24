@@ -271,6 +271,7 @@ public class ToolBelt {
         Tool other;
         private boolean showBanner;
         Supplier<String> banner;
+        public boolean hidden;
 
         CommandSet(String name) {
             this.name = name;
@@ -279,6 +280,11 @@ public class ToolBelt {
             commands = new HashMap<>();
             commandSynonyms = new HashMap<>();
             context = new CommandContext();
+        }
+
+        @Override
+        public boolean isHidden() {
+            return hidden;
         }
 
         @Override
@@ -355,7 +361,10 @@ public class ToolBelt {
 
         @Override
         public Set<String> listCommands() {
-            TreeSet<String> strings = new TreeSet<>(commands.keySet());
+            TreeSet<String> strings = new TreeSet<>(commands.keySet()
+                                                            .stream()
+                                                            .filter(name -> !commands.get(name).isHidden())
+                                                            .collect(Collectors.toList()));
             if (null != other) {
                 strings.addAll(other.listCommands());
             }
@@ -411,30 +420,32 @@ public class ToolBelt {
                 commands.keySet()
                         .stream()
                         .sorted()
-                        .forEach(name -> context.getOutput()
-                                                .output(
-                                                        ANSIColorOutput.colorize(
-                                                                ANSIColorOutput.Color.YELLOW,
-                                                                String.format(
-                                                                        "   %s",
-                                                                        name
-                                                                ),
-                                                                String.format(
-                                                                        "%s - %s",
-                                                                        pad(
-                                                                                " ",
-                                                                                max -
-                                                                                name.length()
-                                                                        ),
-                                                                        shortDescription(
-                                                                                commands.get(
-                                                                                        name)
-                                                                                        .getDescription()
-                                                                        )
+                        .filter(name -> !commands.get(name).isHidden())
+                        .forEach(name -> {
+                                     context.getOutput()
+                                            .output(
+                                                    ANSIColorOutput.colorize(
+                                                            ANSIColorOutput.Color.YELLOW,
+                                                            String.format(
+                                                                    "   %s",
+                                                                    name
+                                                            ),
+                                                            String.format(
+                                                                    "%s - %s",
+                                                                    pad(
+                                                                            " ",
+                                                                            max -
+                                                                            name.length()
+                                                                    ),
+                                                                    shortDescription(
+                                                                            commands.get(name)
+                                                                                    .getDescription()
+                                                                    )
 
-                                                                )
-                                                        )
-                                                )
+                                                            )
+                                                    )
+                                            );
+                                 }
                         );
 
                 context.getOutput().output("");
@@ -579,6 +590,11 @@ public class ToolBelt {
                 isSub = true;
             }
         }
+        boolean isHidden = false;
+        Hidden annotation2 = aClass.getAnnotation(Hidden.class);
+        if (null != annotation2) {
+            isHidden = true;
+        }
         Method[] methods = aClass.getMethods();
         String defInvoke = null;
         for (Method method : methods) {
@@ -591,6 +607,7 @@ public class ToolBelt {
                 MethodInvoker value = new MethodInvoker(name, method, instance, commands.context);
                 value.description = annotation.description();
                 value.solo = annotation.isSolo();
+                value.hidden = annotation.isHidden();
                 Set<String> annotationSynonyms = new HashSet<>();
                 if (annotation.synonyms().length > 0) {
                     annotationSynonyms.addAll(Arrays.asList(annotation.synonyms()));
@@ -611,6 +628,7 @@ public class ToolBelt {
         }
 
         CommandSet commandSet = new CommandSet(cmd);
+        commandSet.hidden = isHidden;
         commandSet.context = commands.context;
         commandSet.helpCommands = helpCommands;
         commandSet.description = cmdDescription;
@@ -701,6 +719,8 @@ public class ToolBelt {
 
         boolean isDefault();
 
+        boolean isHidden();
+
         Set<String> getSynonyms();
 
         boolean run(String[] args) throws CommandRunFailure, InputError;
@@ -715,6 +735,7 @@ public class ToolBelt {
         Object instance;
         private String description;
         private boolean solo;
+        private boolean hidden;
         private boolean isdefault;
         CommandContext context;
 
@@ -835,6 +856,11 @@ public class ToolBelt {
         @Override
         public boolean isDefault() {
             return isdefault;
+        }
+
+        @Override
+        public boolean isHidden() {
+            return hidden;
         }
     }
 
