@@ -200,7 +200,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
         }
         if (ColorString.class.isAssignableFrom(object.getClass())) {
             ColorString object1 = (ColorString) object;
-            Set<ColorArea> colors = object1.getColors();
+            Set<ColorArea> colors = new TreeSet<>(object1.getColors());
             String string = null != base ? base.format(object1) : object1.toString();
             int cur = 0;
             int count = 0;
