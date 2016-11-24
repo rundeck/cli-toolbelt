@@ -1,11 +1,14 @@
 package com.simplifyops.toolbelt;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.channels.Channels;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Construct subcommands
@@ -97,6 +100,7 @@ public class ToolBelt {
 
     protected ToolBelt(String name) {
         commands = new CommandSet(name);
+        commands.setShowBanner(true);
         helpCommands = new HashSet<>();
         channels = ChannelOutput.builder();
     }
@@ -197,6 +201,42 @@ public class ToolBelt {
         return this;
     }
 
+    /**
+     * Display banner for top level help
+     *
+     * @param text banner text
+     *
+     * @return this
+     */
+    public ToolBelt banner(String text) {
+        this.commands.banner = () -> text;
+        return this;
+    }
+
+    /**
+     * Display banner for top level help
+     *
+     * @param resource resource path
+     *
+     * @return this
+     */
+    public ToolBelt bannerResource(String resource) {
+        this.commands.banner = () -> {
+            InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(resource);
+            if (null != resourceAsStream) {
+                try {
+                    try (BufferedReader is = new BufferedReader(new InputStreamReader(resourceAsStream))) {
+                        return is.lines().collect(Collectors.joining("\n"));
+                    }
+                } catch (IOException e) {
+
+                }
+            }
+            return null;
+        };
+        return this;
+    }
+
     private static class CommandContext {
         private CommandInput inputParser;
         private CommandOutput output;
@@ -229,6 +269,8 @@ public class ToolBelt {
         private String name;
         private Set<String> synonyms;
         Tool other;
+        private boolean showBanner;
+        Supplier<String> banner;
 
         CommandSet(String name) {
             this.name = name;
@@ -345,6 +387,13 @@ public class ToolBelt {
 
         @Override
         public void getHelp() {
+            getHelp(showBanner);
+        }
+
+        public void getHelp(boolean banner) {
+            if (banner && null != this.banner) {
+                context.getOutput().output(ANSIColorOutput.colorizeTemplate(this.banner.get()));
+            }
             if (description != null && !"".equals(description)) {
                 context.getOutput().output(
                         ANSIColorOutput.colorize(
@@ -474,6 +523,14 @@ public class ToolBelt {
         @Override
         public String getDescription() {
             return description;
+        }
+
+        public boolean isShowBanner() {
+            return showBanner;
+        }
+
+        public void setShowBanner(boolean showBanner) {
+            this.showBanner = showBanner;
         }
     }
 
