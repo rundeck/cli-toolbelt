@@ -3,6 +3,7 @@ package com.simplifyops.toolbelt
 import spock.lang.Specification
 
 import static com.simplifyops.toolbelt.ANSIColorOutput.Color.BLUE
+import static com.simplifyops.toolbelt.ANSIColorOutput.Color.BOLD
 import static com.simplifyops.toolbelt.ANSIColorOutput.Color.RED
 import static com.simplifyops.toolbelt.ANSIColorOutput.Color.RESET
 
@@ -85,6 +86,29 @@ class ANSIColorOutputSpec extends Specification {
         where:
         template                               | plain
         'hola ${RED}monkey$$ hi ${BLUE}blue$$' | 'hola monkey hi blue'
+    }
+
+    def "template with partial"() {
+
+        when:
+        def result = ANSIColorOutput.colorizeTemplate(template)
+
+        then:
+        result.colors.size() == 3
+        result.colors.sort()[0].color == BOLD
+        result.colors.sort()[0].start == 5
+        result.colors.sort()[0].length == -1
+        result.colors.sort()[1].color == RED
+        result.colors.sort()[1].start == 5
+        result.colors.sort()[1].length == 6
+        result.colors.sort()[2].color == BLUE
+        result.colors.sort()[2].start == 15
+        result.colors.sort()[2].length == 4
+
+        result.toString() == plain
+        where:
+        template                                       | plain
+        'hola ${BOLD}%${RED}monkey$$ hi ${BLUE}blue$$' | 'hola monkey hi blue'
     }
     def "template multiline"() {
 

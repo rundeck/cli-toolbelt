@@ -212,7 +212,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
                     sb.append(Color.RESET.toString());
                     count--;
                 }
-                if (area.getStart() > cur) {
+                if (area.getStart() >= cur) {
                     sb.append(string.substring(cur, area.getStart()));
                 }
                 cur = area.getStart();
@@ -221,8 +221,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
                     sb.append(string.substring(cur, cur + area.getLength()));
                     cur += area.getLength();
                     sb.append(Color.RESET.toString());
-                } else {
-
+                } else if (area.getColor().compareTo(Color.NONDISPLAYED) > 0) {
                     count++;
                 }
             }
@@ -265,6 +264,12 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
     public static enum Color {
 
         RESET("0"),
+        BOLD("1"),
+        UNDERLINE("4"),
+        BLINK("5"),
+        REVERSE("7"),
+        NONDISPLAYED("8"),
+
         RED("31"),
         ORANGE("38;5;208"),
         GREEN("32"),
@@ -322,6 +327,8 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
         default int compareTo(ColorArea ca) {
             return getStart() < ca.getStart() ? -1 :
                    getStart() > ca.getStart() ? 1 :
+                   getLength() < ca.getLength() ? -1 :
+                   getLength() > ca.getLength() ? 1 :
                    0;
         }
     }
@@ -361,7 +368,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
      * @return
      */
     public static ColorString colorizeTemplate(String template) {
-        Pattern pat = Pattern.compile("\\$\\{(\\w+)\\}(.+?)\\$\\$", Pattern.DOTALL);
+        Pattern pat = Pattern.compile("\\$\\{(\\w+)\\}(?:%|(.+?)\\$\\$)", Pattern.DOTALL);
         Matcher m = pat.matcher(template);
         StringBuffer sb = new StringBuffer();
         Set<ColorArea> colors = new HashSet<>();
@@ -370,8 +377,14 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
             int loc = sb.length() + (m.start() - last);
             last = m.end();
             Color color = Color.valueOf(m.group(1).toUpperCase());
+            int length = -1;
+            String text = null;
+            if (m.group(2) != null) {
+                text = m.group(2);
+                length = text.length();
+            }
 
-            String text = m.group(2);
+            final int finalLength = length;
             ColorArea area = new ColorArea() {
                 @Override
                 public int getStart() {
@@ -380,7 +393,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
 
                 @Override
                 public int getLength() {
-                    return text.length();
+                    return finalLength;
                 }
 
                 @Override
@@ -388,7 +401,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
                     return color;
                 }
             };
-            m.appendReplacement(sb, Matcher.quoteReplacement(text));
+            m.appendReplacement(sb, text != null ? Matcher.quoteReplacement(text) : "");
             colors.add(area);
         }
         m.appendTail(sb);
