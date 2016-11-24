@@ -67,4 +67,44 @@ class ANSIColorOutputSpec extends Specification {
         then:
         result == "${RED}te${RESET}${BLUE}st${RESET}".toString()
     }
+
+    def "template"() {
+
+        when:
+        def result = ANSIColorOutput.colorizeTemplate(template)
+
+        then:
+        result.colors.sort()[0].color == RED
+        result.colors.sort()[0].start == 5
+        result.colors.sort()[0].length == 6
+        result.colors.sort()[1].color == BLUE
+        result.colors.sort()[1].start == 15
+        result.colors.sort()[1].length == 4
+
+        result.toString() == plain
+        where:
+        template                               | plain
+        'hola ${RED}monkey$$ hi ${BLUE}blue$$' | 'hola monkey hi blue'
+    }
+    def "template multiline"() {
+
+        when:
+        def result = ANSIColorOutput.colorizeTemplate(template)
+
+        then:
+        result.colors.sort()[0].color == BLUE
+        result.colors.sort()[0].start == 0
+        result.colors.sort()[0].length == 4
+        result.colors.sort()[1].color == RED
+        result.colors.sort()[1].start == 6
+        result.colors.sort()[1].length == 30
+
+
+
+
+        result.toString() == plain
+        where:
+        template                               | plain
+        '${blue}hola$$ \n${RED}\nmonkey \nhella oh yah\n\nhi blue$$' | 'hola \n\nmonkey \nhella oh yah\n\nhi blue'
+    }
 }

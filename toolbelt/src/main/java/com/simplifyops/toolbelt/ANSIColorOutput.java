@@ -353,6 +353,48 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
         }
     }
 
+    /**
+     * Convert a template of the form ${COLOR}text$$ with colorized output
+     *
+     * @param template
+     *
+     * @return
+     */
+    public static ColorString colorizeTemplate(String template) {
+        Pattern pat = Pattern.compile("\\$\\{(\\w+)\\}(.+?)\\$\\$", Pattern.DOTALL);
+        Matcher m = pat.matcher(template);
+        StringBuffer sb = new StringBuffer();
+        Set<ColorArea> colors = new HashSet<>();
+        int last = 0;
+        while (m.find()) {
+            int loc = sb.length() + (m.start() - last);
+            last = m.end();
+            Color color = Color.valueOf(m.group(1).toUpperCase());
+
+            String text = m.group(2);
+            ColorArea area = new ColorArea() {
+                @Override
+                public int getStart() {
+                    return loc;
+                }
+
+                @Override
+                public int getLength() {
+                    return text.length();
+                }
+
+                @Override
+                public Color getColor() {
+                    return color;
+                }
+            };
+            m.appendReplacement(sb, Matcher.quoteReplacement(text));
+            colors.add(area);
+        }
+        m.appendTail(sb);
+
+        return new Colorized(colors, sb.toString());
+    }
     public static ColorString colorize(Color color, String string) {
         final Set<ColorArea> colors = new TreeSet<>();
         colors.add(() -> color);
