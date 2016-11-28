@@ -492,7 +492,7 @@ public class ToolBelt {
                 return commandInvoke.run(args);
             } catch (InputError inputError) {
                 context.getOutput().warning(String.format(
-                        "Error parsing arguments for [%s]: %s",
+                        "Input error for [%s]: %s",
                         cmd,
                         inputError.getMessage()
                 ));
