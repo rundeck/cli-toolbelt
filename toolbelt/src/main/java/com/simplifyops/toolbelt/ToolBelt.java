@@ -584,12 +584,12 @@ public class ToolBelt {
         }
         String cmdDescription = null != annotation1 ? annotation1.description() : null;
         boolean isSub = false;
-        if (null == annotation1) {
-            SubCommand annotation2 = aClass.getAnnotation(SubCommand.class);
-            if (null != annotation2) {
-                isSub = true;
-            }
+
+        SubCommand subcmdAnnotation = aClass.getAnnotation(SubCommand.class);
+        if (null != subcmdAnnotation) {
+            isSub = true;
         }
+
         boolean isHidden = false;
         Hidden annotation2 = aClass.getAnnotation(Hidden.class);
         if (null != annotation2) {
@@ -649,6 +649,7 @@ public class ToolBelt {
             parent.getSynonyms().addAll(synonyms);
         } else {
             parent.commands.putAll(commandSet.commands);
+            parent.commandSynonyms.putAll(subSynonyms);
         }
 
     }
