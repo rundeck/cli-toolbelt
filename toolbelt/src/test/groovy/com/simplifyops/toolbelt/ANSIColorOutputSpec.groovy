@@ -131,4 +131,44 @@ class ANSIColorOutputSpec extends Specification {
         template                               | plain
         '${blue}hola$$ \n${RED}\nmonkey \nhella oh yah\n\nhi blue$$' | 'hola \n\nmonkey \nhella oh yah\n\nhi blue'
     }
+
+    def "colorize result"() {
+        when:
+        ANSIColorOutput.ColorString result = ANSIColorOutput.colorize(col, str)
+        then:
+        result.getColors().size() == 1
+        result.getColors().first().length == -1
+        result.getColors().first().start == 0
+        result.toString() == expected
+        where:
+        col                        | str   | expected
+        ANSIColorOutput.Color.BLUE | 'abc' | 'abc'
+        ANSIColorOutput.Color.BLUE | 'a'   | 'a'
+
+    }
+
+    def "toColors"() {
+        when:
+        ANSIColorOutput.ColorString colorString = ANSIColorOutput.colorize(col, str)
+        String result = ANSIColorOutput.toColors(colorString)
+        then:
+        result == expected
+        where:
+        col                        | str   | expected
+        ANSIColorOutput.Color.BLUE | 'abc' | '\u001B[34mabc\u001B[0m'
+        ANSIColorOutput.Color.BLUE | 'a'   | '\u001B[34ma\u001B[0m'
+    }
+
+    def "toColors with area"() {
+        when:
+        ANSIColorOutput.ColorString colorString = ANSIColorOutput.colorize(pref, col, str, suf)
+        String result = ANSIColorOutput.toColors(colorString)
+        then:
+        result == expected
+        where:
+        col                        | pref  | str   | suf   | expected
+        ANSIColorOutput.Color.BLUE | 'abc' | 'def' | 'ghi' | 'abc\u001B[34mdef\u001B[0mghi'
+        ANSIColorOutput.Color.BLUE | 'abc' | 'def' | 'g'   | 'abc\u001B[34mdef\u001B[0mg'
+        ANSIColorOutput.Color.BLUE | 'abc' | 'd'   | 'efg' | 'abc\u001B[34md\u001B[0mefg'
+    }
 }

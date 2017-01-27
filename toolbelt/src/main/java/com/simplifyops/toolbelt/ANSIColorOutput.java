@@ -225,7 +225,7 @@ public class ANSIColorOutput implements CommandOutput, OutputFormatter {
                     count++;
                 }
             }
-            if (cur < string.length() - 1) {
+            if (cur < string.length()) {
                 sb.append(string.substring(cur));
             }
 
