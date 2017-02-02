@@ -10,6 +10,7 @@ import static com.simplifyops.toolbelt.NiceFormatter.NL;
 public class PrefixFormatter implements OutputFormatter {
     String prefix;
     OutputFormatter base;
+    private boolean truncateFinalNewline = true;
 
     public PrefixFormatter(final String prefix) {
         this.prefix = prefix;
@@ -34,16 +35,35 @@ public class PrefixFormatter implements OutputFormatter {
 
     private void indent(final String text, final StringBuilder sb, final boolean firstLine, final String prefix) {
         if (text.contains(NL)) {
-            for (String s : text.split(Pattern.quote(NL))) {
-                sb.append(this.prefix).append(s).append(NL);
+            String[] split = text.split(Pattern.quote(NL), -1);
+            int length = split.length;
+            if (text.endsWith(NL)) {
+                length--;
+            }
+            for (int i = 0; i < length; i++) {
+                if (i > 0) {
+                    sb.append(NL);
+                }
+                sb.append(prefix).append(split[i]);
+            }
+            if (text.endsWith(NL) && !isTruncateFinalNewline()) {
+                sb.append(NL);
             }
         } else {
-            sb.append(this.prefix).append(text);
+            sb.append(prefix).append(text);
         }
     }
 
     @Override
     public OutputFormatter withBase(final OutputFormatter base) {
         return new PrefixFormatter(prefix, base);
+    }
+
+    public boolean isTruncateFinalNewline() {
+        return truncateFinalNewline;
+    }
+
+    public void setTruncateFinalNewline(boolean truncateFinalNewline) {
+        this.truncateFinalNewline = truncateFinalNewline;
     }
 }
