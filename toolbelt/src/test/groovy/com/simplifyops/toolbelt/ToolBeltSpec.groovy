@@ -38,6 +38,26 @@ class ToolBeltSpec extends Specification {
         }
     }
 
+    class MyTool3 implements HasSubCommands {
+        String name
+        int age
+        boolean leaving
+        boolean greetResult
+
+        @Override
+        List<Object> getSubCommands() {
+            [new MyTool2()]
+        }
+
+        @Command()
+        public boolean amethod(@Arg("name") String name, @Arg("age") int age, @Arg("leaving") boolean leaving) {
+            this.name = name
+            this.age = age
+            this.leaving = leaving
+            greetResult
+        }
+    }
+
     class TestOutput implements CommandOutput {
         List<Object> output = []
         List<Object> error = []
@@ -127,6 +147,21 @@ class ToolBeltSpec extends Specification {
         test.age == 54
         test.leaving == true
         result == false
+    }
+
+    def "single command method with hassubcommands"() {
+        given:
+        def test = new MyTool3()
+        def output = new TestOutput()
+        def tool = ToolBelt.with('test', output, test)
+        when:
+        def result = tool.runMain(['mytool3'] as String[], false)
+        then:
+        result == false
+        output.output.contains "Available commands:\n"
+        output.output.contains '   amethod - '
+        output.output.contains '   mytool2 - '
+        output.output.contains 'Use "mytool3 [command] help" to get help on any command.'
     }
 
     class ColorTool {

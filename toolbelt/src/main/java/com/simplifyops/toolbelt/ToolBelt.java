@@ -635,14 +635,14 @@ public class ToolBelt {
         commandSet.commands.putAll(subCommands);
         commandSet.commandSynonyms.putAll(subSynonyms);
         commandSet.defCommand = defInvoke;
-        if (subCommands.size() == 1) {
-            //single command
-            commandSet.defCommand = subCommands.keySet().iterator().next();
-        }
         if (instance instanceof HasSubCommands) {
             HasSubCommands subs = (HasSubCommands) instance;
             List<Object> subCommands1 = subs.getSubCommands();
             subCommands1.forEach(o -> introspect(commandSet, o));
+        }
+        if (commandSet.commands.size() == 1) {
+            //single command
+            commandSet.defCommand = commandSet.commands.keySet().iterator().next();
         }
         if (!isSub) {
             parent.commands.put(cmd, commandSet);
