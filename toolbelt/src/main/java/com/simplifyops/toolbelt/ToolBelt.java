@@ -240,6 +240,7 @@ public class ToolBelt {
     private static class CommandContext {
         private CommandInput inputParser;
         private CommandOutput output;
+        private boolean printStackTrace;
 
 
         CommandInput getInputParser() {
@@ -257,6 +258,14 @@ public class ToolBelt {
         public void setOutput(CommandOutput output) {
             this.output = output;
         }
+
+        public boolean isPrintStackTrace() {
+            return printStackTrace;
+        }
+
+        public void setPrintStackTrace(boolean printStackTrace) {
+            this.printStackTrace = printStackTrace;
+        }
     }
 
     private static class CommandSet implements Tool, CommandInvoker {
@@ -271,6 +280,7 @@ public class ToolBelt {
         Tool other;
         private boolean showBanner;
         Supplier<String> banner;
+        Supplier<Boolean> printStackTrace;
         public boolean hidden;
 
         CommandSet(String name) {
@@ -325,9 +335,11 @@ public class ToolBelt {
             } catch (CommandRunFailure commandRunFailure) {
                 context.getOutput().error(commandRunFailure.getMessage());
                 //verbose
-                StringWriter sb = new StringWriter();
-                commandRunFailure.printStackTrace(new PrintWriter(sb));
-                context.getOutput().error(sb.toString());
+                if (printStackTrace == null || printStackTrace.get()) {
+                    StringWriter sb = new StringWriter();
+                    commandRunFailure.printStackTrace(new PrintWriter(sb));
+                    context.getOutput().error(sb.toString());
+                }
             }
             if (!result && exitSystem) {
                 System.exit(2);
@@ -666,6 +678,17 @@ public class ToolBelt {
         return this;
     }
 
+    /**
+     * Enable or disable stacktrace printing on error
+     *
+     * @param printStackTrace true to print stack traces (default)
+     *
+     * @return this
+     */
+    public ToolBelt printStackTrace(boolean printStackTrace) {
+        commands.printStackTrace = () -> printStackTrace;
+        return this;
+    }
 
     /**
      * Build the Tool
@@ -783,6 +806,12 @@ public class ToolBelt {
                 if (e.getCause() != null) {
                     if (e.getCause() instanceof InputError) {
                         throw (InputError) e.getCause();
+                    }
+                    if (e.getCause() instanceof RuntimeException) {
+                        throw (RuntimeException) e.getCause();
+                    }
+                    if (e.getCause() instanceof CommandRunFailure) {
+                        throw (CommandRunFailure) e.getCause();
                     }
                     e.getCause().printStackTrace();
                 } else {
