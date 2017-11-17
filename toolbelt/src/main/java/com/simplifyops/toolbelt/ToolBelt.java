@@ -8,6 +8,8 @@ import java.nio.channels.Channels;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -221,13 +223,33 @@ public class ToolBelt {
      * @return this
      */
     public ToolBelt bannerResource(String resource) {
+        return bannerResource(resource, null);
+    }
+
+    /**
+     * Display banner for top level help
+     *
+     * @param resource     resource path
+     * @param replacements a map of Regex->replacement, to replace values in the loaded resource
+     *
+     * @return this
+     */
+    public ToolBelt bannerResource(String resource, Map<String, String> replacements) {
         this.commands.banner = () -> {
             InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(resource);
             if (null != resourceAsStream) {
                 try {
+                    String result;
                     try (BufferedReader is = new BufferedReader(new InputStreamReader(resourceAsStream))) {
-                        return is.lines().collect(Collectors.joining("\n"));
+                        result = is.lines().collect(Collectors.joining("\n"));
                     }
+                    if (replacements != null && !replacements.isEmpty()) {
+                        for (String s : replacements.keySet()) {
+                            String val = replacements.get(s);
+                            result = result.replaceAll(s, Matcher.quoteReplacement(val));
+                        }
+                    }
+                    return result;
                 } catch (IOException e) {
 
                 }
