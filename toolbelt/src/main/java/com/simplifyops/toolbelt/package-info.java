@@ -48,7 +48,7 @@
  * For more advanced usage, see below:
  * </p>
  * <p>
- * Use {@link com.simplifyops.toolbelt.ToolBelt#belt()} to create a builder.
+ * Use {@link com.simplifyops.toolbelt.ToolBelt#belt(java.lang.String)} to create a builder.
  * </p>
  * <pre><code>
  * ToolBelt.belt()
