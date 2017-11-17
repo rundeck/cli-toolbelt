@@ -7,7 +7,11 @@ import java.util.Map;
  * Created by greg on 11/17/16.
  */
 public interface Formatable {
-    public List<?> asList();
+    default List<?> asList() {
+        return null;
+    }
 
-    public Map<?, ?> asMap();
+    default Map<?, ?> asMap() {
+        return null;
+    }
 }
