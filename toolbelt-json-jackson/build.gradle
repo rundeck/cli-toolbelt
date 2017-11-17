@@ -8,8 +8,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.2'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.2'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.8.10'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.10'
     compile project(":toolbelt")
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
