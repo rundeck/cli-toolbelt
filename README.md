@@ -15,7 +15,7 @@ From this:
 ~~~ {.java}
 package example;
 
-import com.simplifyops.toolbelt.*;
+import org.rundeck.toolbelt.*;
 
 import java.io.IOException;
 
@@ -151,7 +151,7 @@ ToolBelt.with(new Command1(), new Command2(),...).runMain(args);
 
 For more advanced usage, see below:
 
-Use `com.simplifyops.toolbelt.ToolBelt#belt()` to create a builder.
+Use `org.rundeck.toolbelt.ToolBelt#belt()` to create a builder.
 
 
 ~~~~ {.java}
@@ -167,7 +167,7 @@ ToolBelt.belt()
 ~~~~
 
 
-Within your MyCommand classes, use the {@link com.simplifyops.toolbelt.Command @Command} annotation to indicate the
+Within your MyCommand classes, use the {@link org.rundeck.toolbelt.Command @Command} annotation to indicate the
 class is a top-level command (optional).  Add the same annotation on any methods within the class to expose them
 as subcommands. At least one method should be annotated this way.
 
@@ -193,7 +193,7 @@ For further nesting, the class can implement `HasSubCommands` and return
 other command container objects. 
 
 If a `@Command` annotated class wants to define a subcommand which is also a container (has subcommands of
-its own), It should implement {@link com.simplifyops.toolbelt.HasSubCommands}, and return a list of command
+its own), It should implement {@link org.rundeck.toolbelt.HasSubCommands}, and return a list of command
 container objects.
 
 
@@ -262,7 +262,7 @@ dependencies{
 Add `JewelInput` as a InputParser to your ToolBelt:
 
 ~~~{.java}
-import com.simplifyops.toolbelt.input.jewelcli.JewelInput;
+import org.rundeck.toolbelt.input.jewelcli.JewelInput;
 ...
 Tool cli = ToolBelt.belt(name)
     .add(new MyCommand())

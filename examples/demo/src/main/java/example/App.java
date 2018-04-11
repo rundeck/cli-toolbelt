@@ -1,6 +1,6 @@
 package example;
 
-import com.simplifyops.toolbelt.*;
+import org.rundeck.toolbelt.*;
 
 import java.io.IOException;
 

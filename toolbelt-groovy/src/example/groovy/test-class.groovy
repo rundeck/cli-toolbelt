@@ -4,10 +4,10 @@
  */
 @GrabResolver(name='jitpack', root='https://jitpack.io')
 @Grab('com.github.simplifyops.cli-toolbelt:toolbelt-groovy:-SNAPSHOT')
-import static com.simplifyops.toolbelt.groovy.Toolbelt.toolbelt
+import static org.rundeck.toolbelt.groovy.Toolbelt.toolbelt
 
-import com.simplifyops.toolbelt.Command
-import com.simplifyops.toolbelt.Arg
+import org.rundeck.toolbelt.Command
+import org.rundeck.toolbelt.Arg
 
 class MyCommand {
     @Command
