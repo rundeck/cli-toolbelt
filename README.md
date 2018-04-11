@@ -8,7 +8,7 @@ Java Commandline Interface in three lines of code... **or your money back**.
 
 Get this:
 
-![console output](https://github.com/simplifyops/cli-toolbelt/raw/master/examples/demo/img/screenshot-console1.png)
+![console output](https://github.com/rundeck/cli-toolbelt/raw/master/examples/demo/img/screenshot-console1.png)
 
 From this:
 
@@ -58,11 +58,11 @@ Builtin features:
 
 # Using
 
-Find the latest version from the [Releases][] section, import via [jitpack.io](https://jitpack.io/#simplifyops/cli-toolbelt):
+Find the latest version from the [Releases][] section, import via [jitpack.io](https://jitpack.io/#rundeck/cli-toolbelt):
 
-[Releases]: https://github.com/simplifyops/cli-toolbelt/releases
+[Releases]: https://github.com/rundeck/cli-toolbelt/releases
 
-[![](https://jitpack.io/v/simplifyops/cli-toolbelt.svg)](https://jitpack.io/#simplifyops/cli-toolbelt)
+[![](https://jitpack.io/v/rundeck/cli-toolbelt.svg)](https://jitpack.io/#rundeck/cli-toolbelt)
 
 Gradle build:
 
@@ -71,13 +71,13 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies{
-    compile 'com.github.simplifyops.cli-toolbelt:toolbelt:VERSION'
+    compile 'com.github.rundeck.cli-toolbelt:toolbelt:VERSION'
 }
 ~~~
 
 # Javadoc
 
-[via jitpack.io](https://jitpack.io/com/github/simplifyops/cli-toolbelt/toolbelt/master-SNAPSHOT/javadoc/)
+[via jitpack.io](https://jitpack.io/com/github/rundeck/cli-toolbelt/toolbelt/master-SNAPSHOT/javadoc/)
 
 # In Progress
 
@@ -95,7 +95,7 @@ sub commands.
 # Examples
 
 * Full featured example: [rundeck-cli commandline tool](https://github.com/rundeck/rundeck-cli)
-* See the [examples](https://github.com/simplifyops/cli-toolbelt/tree/master/examples) directory.
+* See the [examples](https://github.com/rundeck/cli-toolbelt/tree/master/examples) directory.
 
 # More Info
 
@@ -254,8 +254,8 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies{
-    compile 'com.github.simplifyops.cli-toolbelt:toolbelt:VERSION'
-    compile 'com.github.simplifyops.cli-toolbelt:toolbelt-jewelcli:VERSION'
+    compile 'com.github.rundeck.cli-toolbelt:toolbelt:VERSION'
+    compile 'com.github.rundeck.cli-toolbelt:toolbelt-jewelcli:VERSION'
 }
 ~~~
 
