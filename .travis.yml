@@ -18,7 +18,7 @@ deploy:
     - toolbelt-snakeyaml/build/libs/toolbelt-snakeyaml*.jar
     - toolbelt-json-jackson/build/libs/toolbelt-json-jackson*.jar
   on:
-    repo: simplifyops/cli-toolbelt
+    repo: rundeck/cli-toolbelt
     tags: true
   file_glob: true
   skip_cleanup: true
