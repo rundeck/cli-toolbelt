@@ -3,7 +3,7 @@
  */
 @GrabResolver(name='jitpack', root='https://jitpack.io')
 @Grab('com.github.simplifyops.cli-toolbelt:toolbelt-groovy:-SNAPSHOT')
-import static com.simplifyops.toolbelt.groovy.Toolbelt.toolbelt
+import static org.rundeck.toolbelt.groovy.Toolbelt.toolbelt
 
 
 toolbelt('test', args) {

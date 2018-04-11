@@ -1,7 +1,7 @@
 package example;
 
-import com.simplifyops.toolbelt.Arg;
-import com.simplifyops.toolbelt.Command;
+import org.rundeck.toolbelt.Arg;
+import org.rundeck.toolbelt.Command;
 
 /**
  * Created by greg on 7/5/16.
