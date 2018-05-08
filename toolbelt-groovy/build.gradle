@@ -8,6 +8,6 @@ repositories {
 
 dependencies {
 
-    compile 'org.codehaus.groovy:groovy-all:2.3.4'
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
     compile project(":toolbelt")
 }
