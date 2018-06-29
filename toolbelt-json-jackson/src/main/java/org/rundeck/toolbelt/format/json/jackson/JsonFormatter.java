@@ -2,56 +2,75 @@ package org.rundeck.toolbelt.format.json.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.rundeck.toolbelt.BaseDataOutputFormatter;
 import org.rundeck.toolbelt.Formatable;
 import org.rundeck.toolbelt.OutputFormatter;
-import org.rundeck.toolbelt.OutputFormatter;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Created by greg on 11/17/16.
  */
-public class JsonFormatter implements OutputFormatter {
+public class JsonFormatter extends BaseDataOutputFormatter {
     ObjectMapper mapper;
-    OutputFormatter base;
 
     public JsonFormatter() {
+        super();
+        this.mapper = new ObjectMapper();
+    }
+
+    public JsonFormatter(final Function<Object, Optional<Formatable>> dataFormatter) {
+        super(dataFormatter);
         this.mapper = new ObjectMapper();
     }
 
     public JsonFormatter(final OutputFormatter base) {
-        this.base = base;
+        super(base);
+        this.mapper = new ObjectMapper();
+    }
+
+    public JsonFormatter(
+            final OutputFormatter base,
+            final Function<Object, Optional<Formatable>> dataFormatter
+    ) {
+        super(base, dataFormatter);
+        this.mapper = new ObjectMapper();
     }
 
     public JsonFormatter(final ObjectMapper mapper, final OutputFormatter base) {
+        super(base);
         this.mapper = mapper;
-        this.base = base;
+    }
+
+    public JsonFormatter(
+            final OutputFormatter base,
+            final Function<Object, Optional<Formatable>> dataFormatter,
+            final ObjectMapper mapper
+    ) {
+        super(base, dataFormatter);
+        this.mapper = mapper;
     }
 
     @Override
-    public String format(final Object o) {
-        if (o instanceof Formatable) {
-            Formatable o1 = (Formatable) o;
-            List<?> objects = o1.asList();
-            if (null != objects) {
-                return format(objects);
-            }
-            Map<?, ?> map = o1.asMap();
-            if (null != map) {
-                return format(map);
-            }
-        }
+    protected String formatObject(final Object value) {
         try {
-            return mapper.writeValueAsString(o);
+            return mapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return base != null ? base.format(o) : o.toString();
     }
 
     @Override
-    public OutputFormatter withBase(final OutputFormatter base) {
-        return new JsonFormatter(mapper, base);
+    protected boolean canFormatObject(final Object value) {
+        return true;
+    }
+
+    @Override
+    protected OutputFormatter withBase(
+            final Function<Object, Optional<Formatable>> dataFormatter, final OutputFormatter base
+    ) {
+
+        return new JsonFormatter(base, dataFormatter, mapper);
     }
 }
