@@ -654,23 +654,30 @@ public class ToolBelt {
                 }
             }
         }
-        if (subCommands.size() < 1) {
-            throw new IllegalArgumentException("Specified object has no methods with @Command annotation: " + aClass);
-        }
 
         CommandSet commandSet = new CommandSet(cmd);
         commandSet.hidden = isHidden;
         commandSet.context = commands.context;
         commandSet.helpCommands = helpCommands;
         commandSet.description = cmdDescription;
-        commandSet.commands.putAll(subCommands);
-        commandSet.commandSynonyms.putAll(subSynonyms);
-        commandSet.defCommand = defInvoke;
+
         if (instance instanceof HasSubCommands) {
+            if (subCommands.size() < 1) {
+                isSub = true;
+            }
             HasSubCommands subs = (HasSubCommands) instance;
             List<Object> subCommands1 = subs.getSubCommands();
             subCommands1.forEach(o -> introspect(commandSet, o));
         }
+        if (commandSet.commands.size() < 1 && subCommands.size() < 1) {
+            throw new IllegalArgumentException(
+                    "Specified object has no methods with @Command annotation or does not provide subcommands via HasSubCommands: "
+                    + aClass);
+        }
+
+        commandSet.commands.putAll(subCommands);
+        commandSet.commandSynonyms.putAll(subSynonyms);
+        commandSet.defCommand = defInvoke;
         if (commandSet.commands.size() == 1) {
             //single command
             commandSet.defCommand = commandSet.commands.keySet().iterator().next();

@@ -58,6 +58,31 @@ class ToolBeltSpec extends Specification {
         }
     }
 
+    @SubCommand
+    class MyTool4 implements HasSubCommands {
+
+        @Override
+        List<Object> getSubCommands() {
+            [new MyTool2(), new MyTool1()]
+        }
+    }
+
+    class MyTool5 implements HasSubCommands {
+
+        @Override
+        List<Object> getSubCommands() {
+            [new MyTool2(), new MyTool1()]
+        }
+    }
+
+    class MyTool6 implements HasSubCommands {
+
+        @Override
+        List<Object> getSubCommands() {
+            []
+        }
+    }
+
     class TestOutput implements CommandOutput {
         List<Object> output = []
         List<Object> error = []
@@ -162,6 +187,47 @@ class ToolBeltSpec extends Specification {
         output.output.contains '   amethod - '
         output.output.contains '   mytool2 - '
         output.output.contains 'Use "mytool3 [command] help" to get help on any command.'
+    }
+
+    def "subcommand no methods with hassubcommands"() {
+        given:
+            def test = new MyTool4()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test)
+        when:
+            def result = tool.runMain(['-h'] as String[], false)
+        then:
+            result == false
+            output.output.contains "Available commands:\n"
+            output.output.contains '   mytool1 - '
+            output.output.contains '   mytool2 - '
+            output.output.contains 'Use "test [command] help" to get help on any command.'
+    }
+
+    def "only hassubcommands"() {
+        given:
+            def test = new MyTool5()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test)
+        when:
+            def result = tool.runMain(['-h'] as String[], false)
+        then:
+            result == false
+            output.output.contains "Available commands:\n"
+            output.output.contains '   mytool1 - '
+            output.output.contains '   mytool2 - '
+            output.output.contains 'Use "test [command] help" to get help on any command.'
+    }
+
+    def "only hassubcommands with no commands fails"() {
+        given:
+            def test = new MyTool6()
+            def output = new TestOutput()
+        when:
+            def tool = ToolBelt.with('test', output, test)
+        then:
+            IllegalArgumentException e = thrown()
+            e.message.contains 'Specified object has no methods with @Command annotation or does not provide subcommands via HasSubCommands: '
     }
 
     class ColorTool {
