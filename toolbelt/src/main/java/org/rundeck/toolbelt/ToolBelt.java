@@ -684,7 +684,7 @@ public class ToolBelt {
         }
         if (!isSub) {
             parent.commands.put(cmd, commandSet);
-            parent.getSynonyms().addAll(synonyms);
+            synonyms.forEach(syn -> parent.commandSynonyms.put(syn, commandSet));
         } else {
             parent.commands.putAll(commandSet.commands);
             parent.commandSynonyms.putAll(subSynonyms);
