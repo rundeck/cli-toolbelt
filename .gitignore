@@ -13,8 +13,8 @@ gradle-app.setting
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
 
-/*.ipr
-/*.iml
-/*.iws
+*.ipr
+*.iml
+*.iws
 /.idea
 **/out
