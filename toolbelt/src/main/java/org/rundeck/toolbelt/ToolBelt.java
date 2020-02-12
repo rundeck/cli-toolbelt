@@ -22,14 +22,27 @@ public class ToolBelt {
     private OutputFormatter formatter;
     private boolean ansiColor;
     private ANSIColorOutput.Builder ansiBuilder = ANSIColorOutput.builder().sink(new SystemOutput());
+    private Map<Class<? extends Throwable>, ErrorHandler> errorHandlers = new HashMap<>();
 
     /**
-     * Create a simple CLI tool for the object, using {@link SimpleCommandInput} to parse
-     * CLI args into  method parameters
+     * Handle a throwable type
+     */
+    public interface ErrorHandler {
+        /**
+         * Handle the throwable
+         *
+         * @param throwable throwable
+         * @param context   command context
+         * @return true if the throwable was consumed, false if it should be rethrown
+         */
+        boolean handleError(Throwable throwable, CommandContext context);
+    }
+
+    /**
+     * Create a simple CLI tool for the object, using {@link SimpleCommandInput} to parse CLI args into  method
+     * parameters
      *
      * @param commands
-     *
-     * @return
      */
     public static Tool with(String name, Object... commands) {
         return with(name, new SimpleCommandInput(), commands);
@@ -108,11 +121,15 @@ public class ToolBelt {
      * Add objects as commands
      *
      * @param instance objects
-     *
      * @return this
      */
     public ToolBelt add(final Object... instance) {
         Arrays.asList(instance).forEach(this::introspect);
+        return this;
+    }
+
+    public <T extends Throwable> ToolBelt handles(Class<T> clazz, ErrorHandler handler) {
+        errorHandlers.put(clazz, handler);
         return this;
     }
 
@@ -256,13 +273,57 @@ public class ToolBelt {
         return this;
     }
 
-    private static class CommandContext {
+    public interface CommandContext {
+
+        public CommandInput getInputParser();
+
+        public CommandOutput getOutput();
+
+        public boolean isPrintStackTrace();
+
+        public Map<Class<? extends Throwable>, ErrorHandler> getErrorHandlers();
+
+        public String getSubCommand();
+
+        public List<String> getCommands();
+        String getCommandsString();
+
+        public boolean handle(Throwable t, String command) throws RuntimeException;
+    }
+
+    private static class CommandContextImpl
+            implements CommandContext
+    {
         private CommandInput inputParser;
         private CommandOutput output;
         private boolean printStackTrace;
+        private Map<Class<? extends Throwable>, ErrorHandler> errorHandlers = new HashMap<>();
+        Queue<String> commands = new ArrayDeque<>();
 
 
-        CommandInput getInputParser() {
+        @Override
+        public String getSubCommand() {
+            return commands.peek();
+        }
+
+        @Override
+        public List<String> getCommands() {
+            return new ArrayList<>(commands);
+        }
+        @Override
+        public String getCommandsString() {
+            return String.join(" ", getCommands());
+        }
+
+        void pushCommand(String command) {
+            commands.add(command);
+        }
+
+        String popCommand() {
+            return commands.remove();
+        }
+
+        public CommandInput getInputParser() {
             return inputParser;
         }
 
@@ -285,6 +346,25 @@ public class ToolBelt {
         public void setPrintStackTrace(boolean printStackTrace) {
             this.printStackTrace = printStackTrace;
         }
+
+        public Map<Class<? extends Throwable>, ErrorHandler> getErrorHandlers() {
+            return errorHandlers;
+        }
+
+        public void setErrorHandlers(Map<Class<? extends Throwable>, ErrorHandler> errorHandlers) {
+            this.errorHandlers = errorHandlers;
+        }
+
+        public boolean handle(Throwable t, String command) throws RuntimeException {
+            for (Class<? extends Throwable> aClass : errorHandlers.keySet()) {
+                if (aClass.isAssignableFrom(t.getClass())) {
+                    ErrorHandler errorHandler = errorHandlers.get(aClass);
+                    return errorHandler.handleError(t, this);
+                }
+            }
+            return false;
+        }
+
     }
 
     private static class CommandSet implements Tool, CommandInvoker {
@@ -293,7 +373,7 @@ public class ToolBelt {
         String defCommand;
         Set<String> helpCommands;
         private String description;
-        CommandContext context;
+        CommandContextImpl context;
         private String name;
         private Set<String> synonyms;
         Tool other;
@@ -308,7 +388,7 @@ public class ToolBelt {
             helpCommands = new HashSet<>();
             commands = new HashMap<>();
             commandSynonyms = new HashMap<>();
-            context = new CommandContext();
+            context = new CommandContextImpl();
         }
 
         @Override
@@ -519,21 +599,8 @@ public class ToolBelt {
                 commandInvoke.getHelp();
                 return false;
             }
-            try {
-                return commandInvoke.run(args);
-            } catch (InputError inputError) {
-                context.getOutput().warning(String.format(
-                        "Input error for [%s]: %s",
-                        cmd,
-                        inputError.getMessage()
-                ));
-                context.getOutput().warning(String.format(
-                        "You can use: \"%s %s\" to get help.",
-                        cmd,
-                        helpCommands.iterator().next()
-                ));
-                return false;
-            }
+            context.pushCommand(cmd);
+            return commandInvoke.run(args);
         }
 
         /**
@@ -723,10 +790,25 @@ public class ToolBelt {
      */
     public Tool buckle() {
         commands.context.setInputParser(inputParser);
+        errorHandlers.put(InputError.class, (err, context) -> {
+            context.getOutput().warning(String.format(
+                    "Input error for [%s]: %s",
+                    context.getCommandsString(),
+                    err.getMessage()
+            ));
+            context.getOutput().warning(String.format(
+                    "You can use: \"%s %s\" to get help.",
+                    context.getCommandsString(),
+                    helpCommands.iterator().next()
+            ));
+            return true;
+        });
+        commands.context.setErrorHandlers(errorHandlers);
         commands.helpCommands = helpCommands;
         if (commands.commands.size() == 1) {
             commands.defCommand = commands.commands.keySet().iterator().next();
         }
+        commands.context.pushCommand(commands.name);
         commands.context.setOutput(finalOutput());
         return commands;
     }
@@ -773,7 +855,7 @@ public class ToolBelt {
 
         Set<String> getSynonyms();
 
-        boolean run(String[] args) throws CommandRunFailure, InputError;
+        boolean run(String[] args) throws CommandRunFailure;
 
         void getHelp();
     }
@@ -803,7 +885,7 @@ public class ToolBelt {
         }
 
 
-        public boolean run(String[] args) throws CommandRunFailure, InputError {
+        public boolean run(String[] args) throws CommandRunFailure {
             //get configured arguments to the method
             Class[] parameters = method.getParameterTypes();
             Parameter[] params = method.getParameters();
@@ -817,7 +899,16 @@ public class ToolBelt {
                 } else if (type.isAssignableFrom(String[].class)) {
                     objArgs[i] = args;
                 } else {
-                    Object t = context.getInputParser().parseArgs(name, args, type, paramName);
+                    Object t = null;
+                    try {
+                        t = context.getInputParser().parseArgs(name, args, type, paramName);
+                    } catch (InputError inputError) {
+                        if (context.handle(inputError, name)) {
+                            return false;
+                        }
+                        inputError.printStackTrace();
+                        return false;
+                    }
 
                     objArgs[i] = t;
                 }
@@ -830,8 +921,8 @@ public class ToolBelt {
                 return false;
             } catch (InvocationTargetException e) {
                 if (e.getCause() != null) {
-                    if (e.getCause() instanceof InputError) {
-                        throw (InputError) e.getCause();
+                    if (context.handle(e.getCause(), name)) {
+                        return false;
                     }
                     if (e.getCause() instanceof RuntimeException) {
                         throw (RuntimeException) e.getCause();

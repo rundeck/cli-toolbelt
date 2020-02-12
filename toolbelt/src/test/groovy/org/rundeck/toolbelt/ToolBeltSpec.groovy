@@ -254,4 +254,40 @@ class ToolBeltSpec extends Specification {
         true      | '\u001B[34mtest\u001B[0m'
         false     | "test"
     }
+
+    class MyError extends Exception {
+        MyError(final String var1) {
+            super(var1)
+        }
+    }
+
+    class MyToolEh {
+        @Command()
+        public boolean amethod(@Arg("name") String name) throws MyError {
+            if (name == null) {
+                throw new MyError("name is null")
+            }
+            return true;
+        }
+    }
+
+    def "error handler for throwable type"() {
+        given:
+            def output = new TestOutput()
+            def test = new MyToolEh()
+            def myEh = Mock(ToolBelt.ErrorHandler)
+            def tool = ToolBelt.belt('test').
+                add(test).
+                commandOutput(output).
+                handles(MyError, myEh).
+                commandInput(new SimpleCommandInput()).
+                buckle()
+
+        when:
+            def result = tool.runMain(['mytooleh', 'amethod', '--namez', 'bob'] as String[], false)
+        then:
+            !result
+            1 * myEh.handleError({ it instanceof MyError }, _) >> true
+
+    }
 }
