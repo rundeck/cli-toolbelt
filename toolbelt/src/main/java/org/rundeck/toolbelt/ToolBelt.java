@@ -663,10 +663,77 @@ public class ToolBelt {
 
     /**
      * determine container/commands from annotations on an object, and add to the command set.
+     *
      * @param parent
      * @param instance
      */
     private void introspect(CommandSet parent, final Object instance) {
+        Class<?> aClass = instance.getClass();
+        SubCommand annotation1 = aClass.getAnnotation(SubCommand.class);
+        List<String> path = new ArrayList<>();
+        if (null != annotation1 && annotation1.path().length > 0) {
+            path.addAll(Arrays.asList(annotation1.path()));
+        }
+        if (path.size() > 0) {
+            try {
+                parent = locatePath(parent, path);
+            } catch (InvalidPath invalidPath) {
+                throw new RuntimeException(String.format(
+                        "Unable to define subcommand object of type %s at path: '%s': %s",
+                        instance.getClass().getName(),
+                        String.join(" ", path),
+                        invalidPath.getMessage()
+                ), invalidPath);
+            }
+        }
+        addCommandForParent(parent, instance);
+    }
+
+    /**
+     * Given a parent and a path, return a CommandSet matching the path
+     *
+     * @param parent
+     * @param path
+     */
+    private CommandSet locatePath(final CommandSet parent, final List<String> path) throws InvalidPath {
+        if (path == null || path.size() < 1) {
+            return parent;
+        }
+        String part = path.get(0);
+        CommandSet sub = null;
+        CommandInvoker commandInvoker = parent.commands.get(part);
+        if (null == commandInvoker) {
+
+            CommandSet commandSet = new CommandSet(part);
+            commandSet.hidden = false;
+            commandSet.context = commands.context;
+            commandSet.helpCommands = helpCommands;
+
+            parent.commands.put(part, commandSet);
+            sub = commandSet;
+        } else if (commandInvoker instanceof CommandSet) {
+            sub = (CommandSet) commandInvoker;
+        } else {
+            //TODO: construct a commandset and add invoker as default command
+            throw new InvalidPath(String.format(
+                    "The subcommand at path: '%s' cannot be extended",
+                    String.join(" ", path)
+            ));
+        }
+        ArrayList<String> subpath = new ArrayList<>(path);
+        subpath.remove(0);
+        return locatePath(sub, subpath);
+    }
+
+    static class InvalidPath
+            extends Exception
+    {
+        public InvalidPath(final String message) {
+            super(message);
+        }
+    }
+
+    private void addCommandForParent(CommandSet parent, final Object instance) {
         HashMap<String, CommandInvoker> subCommands = new HashMap<>();
         HashMap<String, CommandInvoker> subSynonyms = new HashMap<>();
         //look for methods
