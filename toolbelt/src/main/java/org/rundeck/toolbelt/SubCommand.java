@@ -12,4 +12,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface SubCommand {
+    /**
+     * Defines a relative path of subcommands that should be the parent of this command
+     *
+     * @return path of subcommand parents
+     */
+    String[] path() default {};
 }

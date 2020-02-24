@@ -67,6 +67,36 @@ class ToolBeltSpec extends Specification {
         }
     }
 
+    @Command
+    @SubCommand(path = ["test1"])
+    class SubCmd1 {
+        Set<String> runMethods = []
+
+        @Command(description = "sub 1")
+        public void amethod(@Arg("name") String name, @Arg("age") Integer age, @Arg("leaving") Boolean leaving) {
+            runMethods << 'amethod'
+
+        }
+
+        @Command(description = "sub 2")
+        public void bmethod(@Arg("name") String name, @Arg("age") Integer age, @Arg("leaving") Boolean leaving) {
+            runMethods << 'bmethod'
+        }
+    }
+
+    @Command
+    @SubCommand(path = ["mytool1"])
+    class SubCmd2 extends SubCmd1{
+
+    }
+
+
+    @Command
+    @SubCommand(path = ["mytool1", "greet"])
+    class SubCmd3 extends SubCmd1{
+
+    }
+
     class MyTool5 implements HasSubCommands {
 
         @Override
@@ -202,6 +232,104 @@ class ToolBeltSpec extends Specification {
             output.output.contains '   mytool1 - '
             output.output.contains '   mytool2 - '
             output.output.contains 'Use "test [command] help" to get help on any command.'
+    }
+
+    def "subcommand with path"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd1()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
+        when:
+            def result = tool.runMain(['-h'] as String[], false)
+        then:
+            result == false
+            output.output.contains "Available commands:\n"
+            output.output.contains '   mytool1 - '
+            output.output.contains '   test1   - '
+            output.output.contains 'Use "test [command] help" to get help on any command.'
+        when:
+            output.output = []
+            def result2 = tool.runMain(['test1', '-h'] as String[], false)
+        then:
+            result2 == false
+            output.output.contains "Available commands:\n"
+            output.output.contains '   amethod - sub 1'
+            output.output.contains '   bmethod - sub 2'
+            output.output.contains 'Use "test1 [command] help" to get help on any command.'
+    }
+
+    def "subcommand with path can run"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd1()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
+        when:
+            def result = tool.runMain(['test1',method] as String[], false)
+        then:
+            result
+            test2.runMethods.contains method
+
+        where:
+            method << ['amethod','bmethod']
+    }
+
+
+    def "subcommand with path extending existing path"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd2()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
+        when:
+            def result = tool.runMain(['-h'] as String[], false)
+        then:
+            result == false
+            output.output.contains "Available commands:\n"
+            output.output.contains '   amethod - sub 1'
+            output.output.contains '   bmethod - sub 2'
+            output.output.contains '   greet   - '
+            output.output.contains 'Use "mytool1 [command] help" to get help on any command.'
+        when:
+            output.output = []
+            def result2 = tool.runMain(['mytool1', '-h'] as String[], false)
+        then:
+            result2 == false
+            output.output.contains "Available commands:\n"
+            output.output.contains '   amethod - sub 1'
+            output.output.contains '   bmethod - sub 2'
+            output.output.contains '   greet   - '
+            output.output.contains 'Use "mytool1 [command] help" to get help on any command.'
+    }
+    def "subcommand with path extending existing path can run"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd2()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
+        when:
+            def result = tool.runMain(['mytool1',method] as String[], false)
+        then:
+            result
+            test2.runMethods.contains method
+
+        where:
+            method << ['amethod','bmethod']
+    }
+
+
+    def "subcommand with path extending terminal path fails"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd3()
+            def output = new TestOutput()
+        when:
+            def tool = ToolBelt.with('test', output, test1, test2)
+        then:
+            RuntimeException e = thrown()
+            e.message.contains("Unable to define subcommand object of type")
+            e.message.contains("at path: 'mytool1 greet': The subcommand at path: 'greet' cannot be extended")
     }
 
     def "only hassubcommands"() {
