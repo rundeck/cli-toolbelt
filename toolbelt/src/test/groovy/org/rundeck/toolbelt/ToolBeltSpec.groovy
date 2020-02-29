@@ -97,6 +97,12 @@ class ToolBeltSpec extends Specification {
 
     }
 
+    @Command
+    @SubCommand(path = ["mytool1", "asdf", "xyz"], descriptions = ["desc1", "desc2", "desc3"])
+    class SubCmd4 extends SubCmd1{
+
+    }
+
     class MyTool5 implements HasSubCommands {
 
         @Override
@@ -316,6 +322,50 @@ class ToolBeltSpec extends Specification {
 
         where:
             method << ['amethod','bmethod']
+    }
+    def "subcommand with path and description sets descriptions"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd4()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
+        when:
+            def result = tool.runMain(['help'] as String[], false)
+        then:
+            !result
+            output.output.contains('desc1\n')
+            output.output.contains('Available commands:\n')
+            output.output.contains('   asdf  - desc2')
+    }
+    def "subcommand with path and description sets descriptions2"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd4()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
+        when:
+            def result = tool.runMain(['mytool1','help'] as String[], false)
+        then:
+            !result
+            output.output.contains('desc1\n')
+            output.output.contains('Available commands:\n')
+            output.output.contains('   asdf  - desc2')
+    }
+    def "subcommand with path and description sets descriptions3"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd4()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
+        when:
+            def result = tool.runMain(['mytool1','asdf','help'] as String[], false)
+        then:
+            !result
+            output.output.contains('desc2\n')
+            output.output.contains('desc3\n')
+            output.output.contains('Available commands:\n')
+            output.output.contains('   amethod - sub 1')
+            output.output.contains('   bmethod - sub 2')
     }
 
 

@@ -18,4 +18,11 @@ public @interface SubCommand {
      * @return path of subcommand parents
      */
     String[] path() default {};
+    /**
+     * Defines descriptions of the parent subcommands, if any, that are not already defined, this should
+     * be the same length as path(), empty strings will be skipped.
+     *
+     * @return descriptions of subcommand parents
+     */
+    String[] descriptions() default {};
 }
