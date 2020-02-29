@@ -648,6 +648,13 @@ public class ToolBelt {
         strings.remove(0);
         return strings.toArray(new String[strings.size()]);
     }
+    public static List<String> tail(final List<String> args) {
+        List<String> strings = new ArrayList<>(args);
+        if(strings.size()>0) {
+            strings.remove(0);
+        }
+        return strings;
+    }
 
     private void introspect(final Object instance) {
         if(instance instanceof CommandInvoker){
@@ -674,9 +681,13 @@ public class ToolBelt {
         if (null != annotation1 && annotation1.path().length > 0) {
             path.addAll(Arrays.asList(annotation1.path()));
         }
+        List<String> descriptions = new ArrayList<>();
+        if (null != annotation1 && annotation1.descriptions().length > 0) {
+            descriptions.addAll(Arrays.asList(annotation1.descriptions()));
+        }
         if (path.size() > 0) {
             try {
-                parent = locatePath(parent, path);
+                parent = locatePath(parent, path, descriptions);
             } catch (InvalidPath invalidPath) {
                 throw new RuntimeException(String.format(
                         "Unable to define subcommand object of type %s at path: '%s': %s",
@@ -695,7 +706,7 @@ public class ToolBelt {
      * @param parent
      * @param path
      */
-    private CommandSet locatePath(final CommandSet parent, final List<String> path) throws InvalidPath {
+    private CommandSet locatePath(final CommandSet parent, final List<String> path, final List<String>  descriptions) throws InvalidPath {
         if (path == null || path.size() < 1) {
             return parent;
         }
@@ -709,10 +720,17 @@ public class ToolBelt {
             commandSet.context = commands.context;
             commandSet.helpCommands = helpCommands;
 
+            if(descriptions.size() > 0 && !"".equals(descriptions.get(0))) {
+                commandSet.description = descriptions.get(0);
+            }
+
             parent.commands.put(part, commandSet);
             sub = commandSet;
         } else if (commandInvoker instanceof CommandSet) {
             sub = (CommandSet) commandInvoker;
+            if (null == sub.description && descriptions.size() > 0 && !"".equals(descriptions.get(0))) {
+                sub.description = descriptions.get(0);
+            }
         } else {
             //TODO: construct a commandset and add invoker as default command
             throw new InvalidPath(String.format(
@@ -720,9 +738,8 @@ public class ToolBelt {
                     String.join(" ", path)
             ));
         }
-        ArrayList<String> subpath = new ArrayList<>(path);
-        subpath.remove(0);
-        return locatePath(sub, subpath);
+
+        return locatePath(sub, tail(path), tail(descriptions));
     }
 
     static class InvalidPath
