@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    tags: 
+    - '[0-9]+\.[0-9]+\.[0-9]+' # Push events to matching semver 20.15.10
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Get Release Version
+      id: get_version
+      run: VERSION=$(./gradlew currentVersion | grep 'version:' | cut -d ' ' -f 3) && echo ::set-output name=VERSION::$VERSION
+    - name: Build with Gradle
+      run: ./gradlew build
+    - name: Publish to Github
+      run: ./gradlew publish
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_USER: gschueler
+    
