@@ -22,9 +22,9 @@ jobs:
       run: VERSION=$(./gradlew currentVersion | grep 'version:' | cut -d ' ' -f 3) && echo ::set-output name=VERSION::$VERSION
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Publish to Github
-      run: ./gradlew publish
+    - name: Publish to Bintray
+      run: ./gradlew -PbintrayUser=gschueler -PbintrayOrg=rundeck -PbintrayRepo=maven -PdryRun=false  bintrayUpload
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GH_USER: gschueler
+        BINTRAY_TOKEN: ${{ secrets.BINTRAY_TOKEN }}
+        BINTRAY_USER: gschueler
     
