@@ -1,7 +1,12 @@
+buildscript{
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+    }
+}
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.4.1'
+    id 'idea'
 }
-
 scmVersion {
     tag {
         prefix = ''
@@ -16,12 +21,82 @@ allprojects {
 subprojects{
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
-    apply from: "${rootDir}/gradle/java.gradle"
-    apply from: "${rootDir}/gradle/publishing.gradle"
+    apply plugin: 'com.jfrog.bintray'
+
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    javadoc {
+        if (JavaVersion.current().isJava8Compatible()) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+        if(JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+
+    publishing {
+        publications {
+            "${project.name}Lib"(MavenPublication) {
+                from components.java
+                version = project.version
+                pom {
+                    name = "Rundeck CLI Toolbelt - ${project.name}"
+                    description = "CLI utility - ${project.name}"
+                    url = 'https://github.com/rundeck/cli-toolbelt'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'gschueler'
+                            name = 'Greg Schueler'
+                            email = 'greg@rundeck.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://github.com/rundeck/cli-toolbelt.git'
+                        developerConnection = 'scm:git:ssh://github.com/rundeck/cli-toolbelt.git'
+                        url = 'https://github.com/rundeck/cli-toolbelt'
+                    }
+                }
+            }
+        }
+
+        bintray {
+            user = findProperty("bintrayUser")
+            key = System.getenv("BINTRAY_TOKEN")
+
+            dryRun = (findProperty('dryRun') ?: 'true').toBoolean()
+            delegate.publish = true
+            publications = ["${project.name}Lib"]
+            pkg {
+                repo = findProperty('bintrayRepo')
+                name = 'cli-' + project.name
+                userOrg = findProperty('bintrayOrg')
+                licenses = ['Apache-2.0']
+                githubRepo = 'rundeck/cli-toolbelt' //Optional Github repository
+                vcsUrl = 'https://github.com/rundeck/cli-toolbelt.git'
+
+                version {
+                    name = project.version
+//                    mavenCentralSync {
+//                        sync = true //[Default: true] Determines whether to sync the version to Maven Central.
+//                        user = findProperty('ossUser') //OSS user token: mandatory
+//                        password = System.getenv("OSS_PASSWORD") //OSS user password: mandatory
+//                    }
+                }
+            }
+        }
+    }
 }
 
-apply plugin: 'idea'
-defaultTasks 'clean', 'build'
 
 repositories {
     mavenCentral()
