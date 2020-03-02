@@ -23,8 +23,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Publish to Bintray
-      run: ./gradlew -PbintrayUser=gschueler -PbintrayOrg=rundeck -PbintrayRepo=maven -PdryRun=false  bintrayUpload
+      run: ./gradlew -PbintrayUser=gschueler -PbintrayOrg=rundeck -PbintrayRepo=maven -PdryRun=false bintrayUpload
       env:
         BINTRAY_TOKEN: ${{ secrets.BINTRAY_TOKEN }}
         BINTRAY_USER: gschueler
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
     

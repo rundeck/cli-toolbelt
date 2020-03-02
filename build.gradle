@@ -91,6 +91,11 @@ subprojects{
 //                        user = findProperty('ossUser') //OSS user token: mandatory
 //                        password = System.getenv("OSS_PASSWORD") //OSS user password: mandatory
 //                    }
+
+                    gpg {
+                        sign = true //Determines whether to GPG sign the files. The default is false
+                        passphrase = System.getenv('SIGNING_PASSWORD')
+                    }
                 }
             }
         }
