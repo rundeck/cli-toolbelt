@@ -5,8 +5,8 @@ repositories {
 }
 
 dependencies {
-    api 'com.fasterxml.jackson.core:jackson-core:2.8.11'
-    api 'com.fasterxml.jackson.core:jackson-databind:2.8.11.1'
+    api 'com.fasterxml.jackson.core:jackson-core:2.9.10'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.9.10.3'
     api project(":toolbelt")
     testImplementation group: 'junit', name: 'junit', version: '4.11'
 }
