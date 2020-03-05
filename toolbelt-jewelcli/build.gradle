@@ -5,7 +5,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.lexicalscope.jewelcli:jewelcli:0.8.9'
-    implementation project(":toolbelt")
+    api 'com.lexicalscope.jewelcli:jewelcli:0.8.9'
+    api project(":toolbelt")
     testImplementation group: 'junit', name: 'junit', version: '4.11'
 }

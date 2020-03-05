@@ -8,6 +8,6 @@ repositories {
 
 dependencies {
 
-    implementation 'org.codehaus.groovy:groovy-all:2.4.7'
-    implementation project(":toolbelt")
+    api 'org.codehaus.groovy:groovy-all:2.4.7'
+    api project(":toolbelt")
 }
