@@ -5,7 +5,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.yaml:snakeyaml:1.9'
-    implementation project(":toolbelt")
+    api 'org.yaml:snakeyaml:1.9'
+    api project(":toolbelt")
     testImplementation group: 'junit', name: 'junit', version: '4.11'
 }
