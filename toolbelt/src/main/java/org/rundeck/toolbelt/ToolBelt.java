@@ -7,7 +7,9 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Construct subcommands
@@ -458,7 +460,11 @@ public class ToolBelt {
             }
             if (null == cmd) {
                 context.getOutput().error(
-                        "No command was specified."
+                        String.format("A command was expected%s",
+                                      context.commands.size() > 1 ?
+                                      (String.format(": %s [command]", context.getCommandsString())) :
+                                      "."
+                        )
                 );
                 getHelp();
                 return false;
@@ -517,21 +523,24 @@ public class ToolBelt {
             if (description != null && !"".equals(description)) {
                 context.getOutput().output(
                         ANSIColorOutput.colorize(
+                                "\n",
                                 ANSIColorOutput.Color.WHITE,
+                                name+": ",
                                 description + "\n"
                         )
                 );
             }
-            boolean multi = commands.size() > 1;
-            if (multi) {
 
-                context.getOutput().output("");
+            List<String> subcommands = commands.keySet()
+                                                  .stream()
+                                                  .sorted()
+                                                  .filter(name -> !commands.get(name).isHidden())
+                                                  .filter(name -> !commands.get(name).isSolo())
+                    .collect(Collectors.toList());
+            if(subcommands.size()>0) {
                 context.getOutput().output("Available commands:\n");
-                int max = commands.keySet().stream().mapToInt(String::length).max().orElse(10);
-                commands.keySet()
-                        .stream()
-                        .sorted()
-                        .filter(name -> !commands.get(name).isHidden())
+                int max = subcommands.stream().mapToInt(String::length).max().orElse(10);
+                subcommands
                         .forEach(name -> {
                                      context.getOutput()
                                             .output(
@@ -558,26 +567,38 @@ public class ToolBelt {
                                             );
                                  }
                         );
-
-                context.getOutput().output("");
-                context.getOutput().output(
-                        ANSIColorOutput.colorize(
-                                ANSIColorOutput.Color.GREEN,
-                                String.format("Use \"%s [command] help\" to get help on any command.", name)
-                        )
-                );
-                return;
             }
+            //find solo command
+            commands.values()
+                    .stream()
+                    .filter(CommandInvoker::isSolo)
+                    .findFirst().ifPresent(CommandInvoker::getHelp);
+            context.getOutput().output("");
+            context.getOutput().output(
+                    ANSIColorOutput.colorize(
+                            ANSIColorOutput.Color.GREEN,
+                            String.format(
+                                    "Use \"%s [command] help\" to get help on any command.",
+                                    context.getCommandsString()
+                            )
+                    )
+            );
+
+        }
+        void deepHelp(){
             for (String command : commands.keySet()) {
                 CommandInvoker commandInvoker = commands.get(command);
-
-                if (multi) {
-                    context.getOutput().output("--------------------");
-                    context.getOutput().output("+ Command: " + command);
-                    if (commandInvoker.getSynonyms() != null && commandInvoker.getSynonyms().size() > 0) {
-                        context.getOutput().output("+ Synonyms: " + commandInvoker.getSynonyms());
-                    }
+                if(commandInvoker.isHidden()){
+                   continue;
                 }
+
+
+                context.getOutput().output("--------------------");
+                context.getOutput().output("+ Command: " + command);
+                if (commandInvoker.getSynonyms() != null && commandInvoker.getSynonyms().size() > 0) {
+                    context.getOutput().output("+ Synonyms: " + commandInvoker.getSynonyms());
+                }
+
                 commandInvoker.getHelp();
             }
             if (null != other) {
@@ -595,11 +616,11 @@ public class ToolBelt {
                         listCommands()
                 ));
             }
+            context.pushCommand(cmd);
             if (args.length > 0 && helpCommands.contains(args[0])) {
                 commandInvoke.getHelp();
                 return false;
             }
-            context.pushCommand(cmd);
             return commandInvoke.run(args);
         }
 
