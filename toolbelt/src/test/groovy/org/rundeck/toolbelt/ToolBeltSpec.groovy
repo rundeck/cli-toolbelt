@@ -282,7 +282,7 @@ class ToolBeltSpec extends Specification {
     }
 
 
-    def "subcommand with path extending existing path"() {
+    def "subcommand with path extending existing path default subcommand"() {
         given:
             def test1 = new MyTool1()
             def test2 = new SubCmd2()
@@ -296,7 +296,15 @@ class ToolBeltSpec extends Specification {
             output.output.contains '   amethod - sub 1'
             output.output.contains '   bmethod - sub 2'
             output.output.contains '   greet   - '
-            output.output.contains 'Use "mytool1 [command] help" to get help on any command.'
+            output.output.contains 'Use "test mytool1 [command] help" to get help on any command.'
+    }
+
+    def "subcommand with path extending existing path"() {
+        given:
+            def test1 = new MyTool1()
+            def test2 = new SubCmd2()
+            def output = new TestOutput()
+            def tool = ToolBelt.with('test', output, test1, test2)
         when:
             output.output = []
             def result2 = tool.runMain(['mytool1', '-h'] as String[], false)
@@ -306,7 +314,7 @@ class ToolBeltSpec extends Specification {
             output.output.contains '   amethod - sub 1'
             output.output.contains '   bmethod - sub 2'
             output.output.contains '   greet   - '
-            output.output.contains 'Use "mytool1 [command] help" to get help on any command.'
+            output.output.contains 'Use "test mytool1 [command] help" to get help on any command.'
     }
     def "subcommand with path extending existing path can run"() {
         given:
@@ -346,9 +354,9 @@ class ToolBeltSpec extends Specification {
             def result = tool.runMain(['mytool1','help'] as String[], false)
         then:
             !result
-            output.output.contains('desc1\n')
-            output.output.contains('Available commands:\n')
-            output.output.contains('   asdf  - desc2')
+            output.output[0] == '\nmytool1: desc1\n'
+            output.output[1] == ('Available commands:\n')
+            output.output[2] == ('   asdf  - desc2')
     }
     def "subcommand with path and description sets descriptions3"() {
         given:
@@ -374,10 +382,10 @@ class ToolBeltSpec extends Specification {
             def result = tool.runMain(['mytool1','asdf','xyz','help'] as String[], false)
         then:
             !result
-            output.output.contains('desc3\n')
-            output.output.contains('Available commands:\n')
-            output.output.contains('   amethod - sub 1')
-            output.output.contains('   bmethod - sub 2')
+            output.output[0] == ('\nxyz: desc3\n')
+            output.output[1] == ('Available commands:\n')
+            output.output[2] == ('   amethod - sub 1')
+            output.output[3] == ('   bmethod - sub 2')
     }
 
 
