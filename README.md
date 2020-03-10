@@ -58,26 +58,28 @@ Builtin features:
 
 # Using
 
-Find the latest version from the [Releases][] section, import via [jitpack.io](https://jitpack.io/#rundeck/cli-toolbelt):
+Find the latest version from the [Releases][] section.
 
 [Releases]: https://github.com/rundeck/cli-toolbelt/releases
 
-[![](https://jitpack.io/v/rundeck/cli-toolbelt.svg)](https://jitpack.io/#rundeck/cli-toolbelt)
 
 Gradle build:
 
 ~~~ {.groovy}
 repositories {
-    maven { url "https://jitpack.io" }
+    jcenter()
 }
 dependencies{
-    compile 'com.github.rundeck.cli-toolbelt:toolbelt:VERSION'
+    compile 'org.rundeck.cli-toolbelt:toolbelt:VERSION'
 }
 ~~~
 
 # Javadoc
 
-[via jitpack.io](https://jitpack.io/com/github/rundeck/cli-toolbelt/toolbelt/master-SNAPSHOT/javadoc/)
+* [toolbelt ![javadoc](https://javadoc.io/badge2/org.rundeck.cli-toolbelt/toolbelt/javadoc.svg)](https://javadoc.io/doc/org.rundeck.cli-toolbelt/toolbelt)
+* [toolbelt-jewelcli ![javadoc](https://javadoc.io/badge2/org.rundeck.cli-toolbelt/toolbelt-jewelcli/javadoc.svg)](https://javadoc.io/doc/org.rundeck.cli-toolbelt/toolbelt-jewelcli)
+* [toolbelt-json-jackson ![javadoc](https://javadoc.io/badge2/org.rundeck.cli-toolbelt/toolbelt-json-jackson/javadoc.svg)](https://javadoc.io/doc/org.rundeck.cli-toolbelt/toolbelt-json-jackson)
+* [toolbelt-snakeyaml ![javadoc](https://javadoc.io/badge2/org.rundeck.cli-toolbelt/toolbelt-snakeyaml/javadoc.svg)](https://javadoc.io/doc/org.rundeck.cli-toolbelt/toolbelt-snakeyaml)
 
 # In Progress
 
