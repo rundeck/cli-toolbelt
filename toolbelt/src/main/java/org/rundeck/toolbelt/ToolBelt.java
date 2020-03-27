@@ -403,11 +403,6 @@ public class ToolBelt {
             return false;
         }
 
-        @Override
-        public boolean isDefault() {
-            return false;
-        }
-
         public CommandSet(final CommandSet commandSet) {
             this.name = commandSet.name;
             this.commands = new HashMap<>(commandSet.commands);
@@ -793,13 +788,14 @@ public class ToolBelt {
             isSub = true;
         }
 
-        boolean isHidden = false;
+        boolean isHidden = null != annotation1 && annotation1.isHidden();
         Hidden annotation2 = aClass.getAnnotation(Hidden.class);
         if (null != annotation2) {
             isHidden = true;
         }
-        Method[] methods = aClass.getMethods();
         String defInvoke = null;
+
+        Method[] methods = aClass.getMethods();
         for (Method method : methods) {
             Command annotation = method.getAnnotation(Command.class);
             if (annotation != null) {
@@ -948,24 +944,36 @@ public class ToolBelt {
     }
 
     public static interface CommandInvoker {
-        String getName();
+        default String getName(){
+            return this.getClass().getSimpleName().toLowerCase();
+        }
 
-        String getDescription();
+        default String getDescription(){
+            return null;
+        }
 
-        boolean isSolo();
+        default boolean isSolo(){
+            return false;
+        }
 
-        boolean isDefault();
+        default boolean isHidden(){
+            return false;
+        }
 
-        boolean isHidden();
-
-        Set<String> getSynonyms();
+        default Set<String> getSynonyms(){
+            return null;
+        }
 
         boolean run(String[] args) throws CommandRunFailure;
 
-        void getHelp();
+        default void getHelp(){
+
+        }
     }
 
-    private static class MethodInvoker implements CommandInvoker {
+    private static class MethodInvoker
+            implements CommandInvoker
+    {
         private String name;
         private Set<String> synonyms;
         Method method;
@@ -973,7 +981,6 @@ public class ToolBelt {
         private String description;
         private boolean solo;
         private boolean hidden;
-        private boolean isdefault;
         CommandContext context;
 
         MethodInvoker(
@@ -1103,11 +1110,6 @@ public class ToolBelt {
         @Override
         public boolean isSolo() {
             return solo;
-        }
-
-        @Override
-        public boolean isDefault() {
-            return isdefault;
         }
 
         @Override
