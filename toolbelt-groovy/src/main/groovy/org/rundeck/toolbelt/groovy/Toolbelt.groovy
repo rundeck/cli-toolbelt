@@ -113,11 +113,6 @@ class Toolbelt {
         }
 
         @Override
-        boolean isDefault() {
-            return false
-        }
-
-        @Override
         boolean run(final String[] args) throws CommandRunFailure, InputError {
             Map<String, Object> params = [:]
             for (String key : arguments.keySet()) {
