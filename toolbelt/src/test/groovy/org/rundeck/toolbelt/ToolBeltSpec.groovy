@@ -488,4 +488,124 @@ class ToolBeltSpec extends Specification {
             1 * myEh.handleError({ it instanceof MyError }, _) >> true
 
     }
+
+    static class TestCH implements ToolBelt.CommandInvoker {
+        String[] sawArgs
+        boolean result
+
+        @Override
+        boolean run(final String[] args) {
+            this.sawArgs = args
+            return result
+        }
+        String description;
+        boolean helped
+
+        void getHelp() {
+            helped = true
+        }
+    }
+
+    def "invoke handler handles all args"() {
+        given:
+            def sut = new TestCH()
+            sut.result = expect
+
+            def output = new TestOutput()
+            def tool = ToolBelt.belt('test').
+                add(sut).
+                commandOutput(output).
+                commandInput(new SimpleCommandInput()).
+                buckle()
+        when:
+            def result = tool.runMain((['testch'] + args) as String[], false)
+
+        then:
+            output.output == []
+            result == expect
+            sut.sawArgs == args
+
+        where:
+            expect | args
+            true   | []
+            true   | ['asdf']
+            false  | []
+            false  | ['asdf']
+    }
+
+    @SubCommand(path = ['a', 'b'], descriptions = ['xyz', 'zyd'])
+    static class TestCH2 extends TestCH{
+
+    }
+    def "invoke handler subcommand handles all args"() {
+        given:
+            def sut = new TestCH2()
+            sut.result = expect
+
+            def output = new TestOutput()
+            def tool = ToolBelt.belt('test').
+                add(sut).
+                commandOutput(output).
+                commandInput(new SimpleCommandInput()).
+                buckle()
+        when:
+            def result = tool.runMain((['a', 'b', 'testch2'] + args) as String[], false)
+
+        then:
+            output.output == []
+            result == expect
+            sut.sawArgs == args
+
+        where:
+            expect | args
+            true   | []
+            true   | ['asdf']
+            false  | []
+            false  | ['asdf']
+    }
+
+    def "invoke handler description"() {
+        given:
+            def sut = new TestCH()
+            sut.result = true
+            sut.description = expect
+
+            def output = new TestOutput()
+            def tool = ToolBelt.belt('test').
+                add(sut).
+                commandOutput(output).
+                defaultHelpCommands().
+                commandInput(new SimpleCommandInput()).
+                buckle()
+        when:
+            def result = tool.runMain((['help']) as String[], false)
+
+        then:
+            output.output.contains('Available commands:\n')
+            output.output.contains('   testch - ' + expect)
+
+        where:
+            value  | expect
+            null   | ''
+            'asdf' | 'asdf'
+    }
+
+    def "invoke handler help"() {
+        given:
+            def sut = new TestCH()
+            sut.result = true
+
+            def output = new TestOutput()
+            def tool = ToolBelt.belt('test').
+                add(sut).
+                commandOutput(output).
+                defaultHelpCommands().
+                commandInput(new SimpleCommandInput()).
+                buckle()
+        when:
+            def result = tool.runMain((['testch', 'help']) as String[], false)
+
+        then:
+            sut.helped
+    }
 }
