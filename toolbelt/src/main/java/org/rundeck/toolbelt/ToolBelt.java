@@ -673,14 +673,6 @@ public class ToolBelt {
     }
 
     private void introspect(final Object instance) {
-        if(instance instanceof CommandInvoker){
-            CommandInvoker cmd=(CommandInvoker)instance;
-            commands.commands.put(cmd.getName(), cmd);
-            if(cmd.getSynonyms()!=null && cmd.getSynonyms().size()>0){
-                cmd.getSynonyms().forEach(synonym -> commands.commandSynonyms.put(synonym, cmd));
-            }
-            return;
-        }
         introspect(commands, instance);
     }
 
@@ -767,6 +759,14 @@ public class ToolBelt {
     }
 
     private void addCommandForParent(CommandSet parent, final Object instance) {
+        if(instance instanceof CommandInvoker){
+            CommandInvoker cmd=(CommandInvoker)instance;
+            parent.commands.put(cmd.getName(), cmd);
+            if(cmd.getSynonyms()!=null && cmd.getSynonyms().size()>0){
+                cmd.getSynonyms().forEach(synonym -> parent.commandSynonyms.put(synonym, cmd));
+            }
+            return;
+        }
         HashMap<String, CommandInvoker> subCommands = new HashMap<>();
         HashMap<String, CommandInvoker> subSynonyms = new HashMap<>();
         //look for methods

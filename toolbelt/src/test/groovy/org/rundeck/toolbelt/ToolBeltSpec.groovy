@@ -506,7 +506,7 @@ class ToolBeltSpec extends Specification {
         }
     }
 
-    def "command handler handles all args"() {
+    def "invoke handler handles all args"() {
         given:
             def sut = new TestCH()
             sut.result = expect
@@ -533,7 +533,38 @@ class ToolBeltSpec extends Specification {
             false  | ['asdf']
     }
 
-    def "command handler description"() {
+    @SubCommand(path = ['a', 'b'], descriptions = ['xyz', 'zyd'])
+    static class TestCH2 extends TestCH{
+
+    }
+    def "invoke handler subcommand handles all args"() {
+        given:
+            def sut = new TestCH2()
+            sut.result = expect
+
+            def output = new TestOutput()
+            def tool = ToolBelt.belt('test').
+                add(sut).
+                commandOutput(output).
+                commandInput(new SimpleCommandInput()).
+                buckle()
+        when:
+            def result = tool.runMain((['a', 'b', 'testch2'] + args) as String[], false)
+
+        then:
+            output.output == []
+            result == expect
+            sut.sawArgs == args
+
+        where:
+            expect | args
+            true   | []
+            true   | ['asdf']
+            false  | []
+            false  | ['asdf']
+    }
+
+    def "invoke handler description"() {
         given:
             def sut = new TestCH()
             sut.result = true
@@ -559,7 +590,7 @@ class ToolBeltSpec extends Specification {
             'asdf' | 'asdf'
     }
 
-    def "command handler help"() {
+    def "invoke handler help"() {
         given:
             def sut = new TestCH()
             sut.result = true
