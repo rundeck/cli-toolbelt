@@ -1,4 +1,4 @@
-name: CI
+name: Bintray publish tag release
 
 on:
   push:
