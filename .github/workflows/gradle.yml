@@ -28,8 +28,6 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        # Artifact name
-        name: Build ${{ steps.get_version.outputs.VERSION }} ${{ github.sha }}
         # Directory containing files to upload
         path: |
           **/build/libs/toolbelt*.jar
