@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    tags: 
+    tags:
     - '[0-9]+\.[0-9]+\.[0-9]+' # Push events to matching semver 20.15.10
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
         java-version: 1.8
     - name: Get Release Version
       id: get_version
-      run: VERSION=$(./gradlew currentVersion | grep 'version:' | cut -d ' ' -f 3) && echo ::set-output name=VERSION::$VERSION
+      run: VERSION=$(./gradlew currentVersion -q -Prelease.quiet) && echo ::set-output name=VERSION::$VERSION
     - name: Build with Gradle
       run: ./gradlew build
     - name: Publish to Bintray
@@ -28,4 +28,4 @@ jobs:
         BINTRAY_TOKEN: ${{ secrets.BINTRAY_TOKEN }}
         BINTRAY_USER: gschueler
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-    
+
