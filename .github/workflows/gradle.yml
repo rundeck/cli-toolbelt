@@ -29,11 +29,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         # Artifact name
-        name: Build ${{ steps.get_version.outputs.VERSION }} ${{ github.ref }}
+        name: Build ${{ steps.get_version.outputs.VERSION }} ${{ github.sha }}
         # Directory containing files to upload
         path: |
-          toolbelt/build/libs/toolbelt*.jar
-          toolbelt-jewelcli/build/libs/toolbelt-jewelcli*.jar
-          toolbelt-groovy/build/libs/toolbelt-groovy*.jar
-          toolbelt-snakeyaml/build/libs/toolbelt-snakeyaml*.jar
-          toolbelt-json-jackson/build/libs/toolbelt-json-jackson*.jar
+          **/build/libs/toolbelt*.jar
+          !**/build/libs/toolbelt*sources.jar
+          !**/build/libs/toolbelt*javadoc.jar
