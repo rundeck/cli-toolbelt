@@ -17,9 +17,7 @@ import java.util.function.Function;
  * formatter will be used
  */
 public class YamlFormatter extends BaseDataOutputFormatter {
-    private Yaml yaml;
-
-
+    private final Yaml yaml;
     /**
      */
     public YamlFormatter() {
@@ -29,8 +27,7 @@ public class YamlFormatter extends BaseDataOutputFormatter {
     /**
      */
     public YamlFormatter(Representer representer, DumperOptions options) {
-        super(new ToStringFormatter());
-        this.yaml = new Yaml(representer, options);
+        this(new Yaml(representer, options), new ToStringFormatter());
     }
 
     public YamlFormatter(
@@ -46,8 +43,7 @@ public class YamlFormatter extends BaseDataOutputFormatter {
      * @param base base formatter
      */
     public YamlFormatter(final OutputFormatter base) {
-        super(base);
-        this.yaml = new Yaml();
+        this(new Yaml(), base);
     }
 
     public YamlFormatter(
