@@ -34,3 +34,5 @@ jobs:
           toolbelt-snakeyaml/build/libs/toolbelt-*.jar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish to Maven Central
+      run: ./gradlew -PsonatypeUsername=${SONATYPE_USERNAME} -PsonatypePassword=${SONATYPE_PASSWORD} -PsigningKey=${GPG_KEY_B64} -PsingingPassword=${SIGNING_PASSWORD} publishToSonatype closeAndReleaseSonatypeStagingRepository

@@ -2,6 +2,7 @@
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.4.1'
     id 'idea'
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 scmVersion {
     tag {
@@ -10,14 +11,26 @@ scmVersion {
     }
     ignoreUncommittedChanges = false
 }
+def base64Decode = { String prop ->
+    project.findProperty(prop) ?
+    new String(Base64.getDecoder().decode(project.findProperty(prop).toString())).trim() :
+    null
+}
+
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
+}
 
 allprojects {
+    group = "org.rundeck.cli-toolbelt"
     project.version = scmVersion.version
 }
 subprojects{
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
-
+    apply plugin: 'signing'
 
     java {
         withJavadocJar()
@@ -62,6 +75,13 @@ subprojects{
                     }
                 }
             }
+        }
+    }
+
+    if(project.hasProperty('signingKey') && project.hasProperty('signingPassword')) {
+        signing {
+            useInMemoryPgpKeys(base64Decode("signingKey"), project.signingPassword)
+            sign(publishing.publications."${project.name}Lib")
         }
     }
 }
