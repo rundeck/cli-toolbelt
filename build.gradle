@@ -1,8 +1,4 @@
-buildscript{
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-    }
-}
+
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.4.1'
     id 'idea'
@@ -21,7 +17,6 @@ allprojects {
 subprojects{
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
-    apply plugin: 'com.jfrog.bintray'
 
 
     java {
@@ -64,37 +59,6 @@ subprojects{
                         connection = 'scm:git:git://github.com/rundeck/cli-toolbelt.git'
                         developerConnection = 'scm:git:ssh://github.com/rundeck/cli-toolbelt.git'
                         url = 'https://github.com/rundeck/cli-toolbelt'
-                    }
-                }
-            }
-        }
-
-        bintray {
-            user = findProperty("bintrayUser")
-            key = System.getenv("BINTRAY_TOKEN")
-
-            dryRun = (findProperty('dryRun') ?: 'true').toBoolean()
-            delegate.publish = true
-            publications = ["${project.name}Lib"]
-            pkg {
-                repo = findProperty('bintrayRepo')
-                name = 'cli-' + project.name
-                userOrg = findProperty('bintrayOrg')
-                licenses = ['Apache-2.0']
-                githubRepo = 'rundeck/cli-toolbelt' //Optional Github repository
-                vcsUrl = 'https://github.com/rundeck/cli-toolbelt.git'
-
-                version {
-                    name = project.version
-//                    mavenCentralSync {
-//                        sync = true //[Default: true] Determines whether to sync the version to Maven Central.
-//                        user = findProperty('ossUser') //OSS user token: mandatory
-//                        password = System.getenv("OSS_PASSWORD") //OSS user password: mandatory
-//                    }
-
-                    gpg {
-                        sign = true //Determines whether to GPG sign the files. The default is false
-                        passphrase = System.getenv('SIGNING_PASSWORD')
                     }
                 }
             }
