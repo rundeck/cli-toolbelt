@@ -25,6 +25,7 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
+        fail_on_unmatched_files: true
         files: |
           toolbelt/build/libs/toolbelt-*.jar
           toolbelt-groovy/build/libs/toolbelt-*.jar
@@ -33,4 +34,3 @@ jobs:
           toolbelt-snakeyaml/build/libs/toolbelt-*.jar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      fail_on_unmatched_files: true
