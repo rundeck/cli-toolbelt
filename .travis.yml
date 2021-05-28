@@ -7,18 +7,3 @@ cache:
   directories:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
-deploy:
-  provider: releases
-  api_key:
-    secure: eBX7tZMdpqe5QO/NWX4nK1Hi+wm7Cv/uAghnQFSUmS1gfiB31DUS6dnujwpyFQcNHmtWFPrCkmNe+YFajTNfH2JDAEh+A2v3BfKpOVb+wLKYIx5r9IX+Eve+l93CvzI18N9qa2bleOSLzdM9gnv7sYeGrmE149uY56ydHi1eG99SakQGiCvd2HQ9RBSMgTBRL53czWi15UtAEL+QNCB8YfdUCAawBywIYug871h1Ruh9iHTmZoBTh9nKQ1VDAK6u2LSY8MhQa0oXiXCbZvomF7KcNnVS4v3HzTPg+klOEw/+i2bElJ7Rqskyv1jhwhOUsGtomjGDF9I81a+5XwZqIJBkVD9sk6eqs8f+GlgFkJOtjxvSsYKaeYL21aOusj3eHD4VWtDedMy1/01ss+NVpAgbiccrXUx3ndWt+S14s8+XGpV0BtnsfP5rjaLmB9QZmLI6Di1zc9Kp34unxHlPiFPGgjQ9k4DXTMzBEoc9C6UkJljo7yNfjb5jAefFvICXu3NOqSgrxYLJD8cG7Ya472CKQxFdkP4KFtz4inB7Q1VNlErXCk7qZuKSOtndF2Hina7P2pWzFdPZ3xNMWCujU8/y6yaDk0gaGPz5BWnhYvtFLl86hVxsn3h4fP/xvqc8PuhRdIvFCduycBEts/Rrh1YKLDyPJ+KJ+F3n9bLkB5Y=
-  file:
-    - toolbelt/build/libs/toolbelt*.jar
-    - toolbelt-jewelcli/build/libs/toolbelt-jewelcli*.jar
-    - toolbelt-groovy/build/libs/toolbelt-groovy*.jar
-    - toolbelt-snakeyaml/build/libs/toolbelt-snakeyaml*.jar
-    - toolbelt-json-jackson/build/libs/toolbelt-json-jackson*.jar
-  on:
-    repo: rundeck/cli-toolbelt
-    tags: true
-  file_glob: true
-  skip_cleanup: true

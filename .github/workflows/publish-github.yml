@@ -1,4 +1,4 @@
-name: Bintray publish tag release
+name: Publish tag release
 
 on:
   push:
@@ -22,10 +22,15 @@ jobs:
       run: VERSION=$(./gradlew currentVersion -q -Prelease.quiet) && echo ::set-output name=VERSION::$VERSION
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Publish to Bintray
-      run: ./gradlew -PbintrayUser=gschueler -PbintrayOrg=rundeck -PbintrayRepo=maven -PdryRun=false bintrayUpload
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          toolbelt/build/libs/toolbelt-*.jar
+          toolbelt-groovy/build/libs/toolbelt-*.jar
+          toolbelt-jewelcli/build/libs/toolbelt-*.jar
+          toolbelt-json-jackson/build/libs/toolbelt-*.jar
+          toolbelt-snakeyaml/build/libs/toolbelt-*.jar
       env:
-        BINTRAY_TOKEN: ${{ secrets.BINTRAY_TOKEN }}
-        BINTRAY_USER: gschueler
-        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      fail_on_unmatched_files: true
