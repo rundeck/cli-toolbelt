@@ -36,3 +36,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish to Maven Central
       run: ./gradlew -PsonatypeUsername=${SONATYPE_USERNAME} -PsonatypePassword=${SONATYPE_PASSWORD} -PsigningKey=${GPG_KEY_B64} -PsingingPassword=${SIGNING_PASSWORD} publishToSonatype closeAndReleaseSonatypeStagingRepository
+      env:
+        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        GPG_KEY_B64: ${{ secrets.GPG_KEY_B64 }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
