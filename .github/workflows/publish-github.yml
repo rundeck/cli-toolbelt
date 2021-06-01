@@ -20,11 +20,8 @@ jobs:
     - name: Get Release Version
       id: get_version
       run: VERSION=$(./gradlew currentVersion -q -Prelease.quiet) && echo ::set-output name=VERSION::$VERSION
-    - name: Build and Sign with Gradle
-      run: ./gradlew sign -PsigningKey=${GPG_KEY_B64} -PsigningPassword=${SIGNING_PASSWORD}
-      env:
-        GPG_KEY_B64: ${{ secrets.GPG_KEY_B64 }}
-        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+    - name: Build with Gradle
+      run: ./gradlew build
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
@@ -38,7 +35,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish to Maven Central
-      run: ./gradlew -PsonatypeUsername=${SONATYPE_USERNAME} -PsonatypePassword=${SONATYPE_PASSWORD} publishToSonatype closeAndReleaseSonatypeStagingRepository
+      run: ./gradlew -PsigningKey=${GPG_KEY_B64} -PsigningPassword=${SIGNING_PASSWORD} -PsonatypeUsername=${SONATYPE_USERNAME} -PsonatypePassword=${SONATYPE_PASSWORD} publishToSonatype closeAndReleaseSonatypeStagingRepository
       env:
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        GPG_KEY_B64: ${{ secrets.GPG_KEY_B64 }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
