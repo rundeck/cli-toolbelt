@@ -83,6 +83,10 @@ subprojects{
             useInMemoryPgpKeys(base64Decode("signingKey"), project.signingPassword)
             sign(publishing.publications)
         }
+
+        tasks.withType(io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository).configureEach {
+            shouldRunAfter(tasks.withType(Sign))
+        }
     }
 }
 
