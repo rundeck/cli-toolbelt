@@ -80,7 +80,7 @@ subprojects{
 
     if(project.hasProperty('signingKey') && project.hasProperty('signingPassword')) {
         signing {
-            useInMemoryPgpKeys(base64Decode("signingKey"), project.signingPassword)
+            useInMemoryPgpKeys(base64Decode("signingKeyXXXX"), project.signingPassword)
             sign(publishing.publications)
         }
 
