@@ -80,12 +80,8 @@ subprojects{
 
     if(project.hasProperty('signingKey') && project.hasProperty('signingPassword')) {
         signing {
-            useInMemoryPgpKeys(base64Decode("signingKeyXXXX"), project.signingPassword)
+            useInMemoryPgpKeys(base64Decode("signingKey"), project.signingPassword)
             sign(publishing.publications)
-        }
-
-        tasks.withType(io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository).configureEach {
-            shouldRunAfter(tasks.withType(Sign))
         }
     }
 }
