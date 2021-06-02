@@ -39,5 +39,5 @@ jobs:
       env:
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-        GPG_KEY_B64: ${{ secrets.GPG_KEY_B64 }}
+        SIGNING_KEY_B64: ${{ secrets.SIGNING_KEY_B64 }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
