@@ -48,7 +48,7 @@ subprojects{
 
     publishing {
         publications {
-            "lib"(MavenPublication) {
+            "${project.name}lib"(MavenPublication) {
                 from components.java
                 version = project.version
                 pom {
@@ -80,10 +80,9 @@ subprojects{
 
     if(project.hasProperty('signingKey') && project.hasProperty('signingPassword')) {
         signing {
-            useInMemoryPgpKeys(project.signingKey, project.signingPassword)
+            useInMemoryPgpKeys(base64Decode("signingKey"), project.signingPassword)
             sign(publishing.publications)
         }
-        task('sign').dependsOn("signLibPublication")
     }
 }
 
