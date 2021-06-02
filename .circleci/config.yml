@@ -50,3 +50,16 @@ jobs:
           path: toolbelt-jewelcli/build/test-results
       - store_test_results:
           path: toolbelt-snakeyaml/build/test-results
+      - run:
+          name: Assemble JARs
+          command: ./gradlew assemble
+      - store_artifacts:
+          path: toolbelt/build/libs
+      - store_artifacts:
+          path: toolbelt-groovy/build/libs
+      - store_artifacts:
+          path: toolbelt-json-jackson/build/libs
+      - store_artifacts:
+          path: toolbelt-jewelcli/build/libs
+      - store_artifacts:
+          path: toolbelt-snakeyaml/build/libs
