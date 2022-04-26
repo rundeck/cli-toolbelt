@@ -9,5 +9,5 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
 
     api project(":toolbelt")
-    testImplementation group: 'junit', name: 'junit', version: '4.11'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
