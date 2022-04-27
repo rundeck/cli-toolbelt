@@ -8,6 +8,6 @@ repositories {
 
 dependencies {
 
-    api 'org.codehaus.groovy:groovy-all:2.5.16'
+    api 'org.codehaus.groovy:groovy-all:3.0.10'
     api project(":toolbelt")
 }
